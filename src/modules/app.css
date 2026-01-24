@@ -1,0 +1,113 @@
+/* app.css */
+
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+.global-error {
+  background: linear-gradient(135deg, #ff3b30, #ff9500);
+  color: white;
+  padding: var(--spacing-md);
+  animation: slideDown 0.3s ease;
+}
+
+.error-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.error-icon {
+  font-size: 1.5rem;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Materie specific styles */
+
+.materie-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.info-badge {
+  background: var(--accent-orange);
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.error-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  gap: var(--spacing-md);
+}
+
+.error-icon, .empty-icon {
+  font-size: 3rem;
+  opacity: 0.7;
+}
+
+.empty-state h3 {
+  margin: 0;
+  color: var(--label-primary);
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--label-secondary);
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  gap: var(--spacing-md);
+}
+
+.demo-credentials {
+  background: var(--secondary-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-md);
+  font-size: 0.875rem;
+  color: var(--label-secondary);
+}
+
+.demo-credentials p {
+  margin: 4px 0;
+}
+
+.capitalize{
+  text-transform: capitalize;
+}
+
+.welcome-section{
+  margin-bottom: var(--spacing-xl);
+}

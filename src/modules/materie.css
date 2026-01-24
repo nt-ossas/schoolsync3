@@ -1,0 +1,70 @@
+/* materie.css */
+
+.materie-section {
+  margin-top: var(--spacing-2xl);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  gap: var(--spacing-md);
+}
+
+.materie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .materie-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.materie-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.materie-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--label-primary);
+}
+
+.materie-list.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-2xl);
+  text-align: center;
+}
+
+.flex{
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.btn-large{
+  margin-top: 50px !important;
+  margin: auto;
+}
+
+.header-info{
+  text-transform: capitalize;
+}

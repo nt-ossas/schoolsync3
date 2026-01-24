@@ -1,0 +1,58 @@
+/* footer.css */
+.footer {
+  background: var(--secondary-background);
+  border-top: 1px solid var(--tertiary-background);
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.footer-logo {
+  font-size: 2rem;
+}
+
+.footer-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--label-primary);
+}
+
+.footer-tagline {
+  color: var(--label-secondary);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.footer-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--tertiary-background);
+}
+
+.footer-copyright {
+  color: var(--label-tertiary);
+  font-size: 0.875rem;
+  text-align: center;
+}

@@ -1,0 +1,97 @@
+/* navbar.css */
+.navbar {
+  background: var(--system-background);
+  border-bottom: 1px solid var(--tertiary-background);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+}
+
+.navbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  background: var(--label-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.navbar-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.navbar-profile:hover {
+  translate: 0 -1px;
+}
+
+.navbar-profile:hover .profile-name{
+  text-decoration: underline;
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-green), var(--accent-blue));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.profile-name {
+  font-weight: 500;
+  color: var(--label-primary);
+  text-transform: capitalize;
+}
+
+.logout-btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  transition: .3s;
+}
+
+.logout-btn:hover{
+  background-color: var(--accent-red) !important;
+  color: var(--secondary-background);
+  transition: .3s;
+}
+
+.fa-arrow-right-from-bracket{
+  rotate: 180deg;
+}
