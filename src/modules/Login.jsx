@@ -2,8 +2,8 @@ import { useState } from "react";
 import "./login.css";
 
 export function Login({ onLogin, apiUrl }) {
-  const [email, setEmail] = useState("mario@test.com");
-  const [password, setPassword] = useState("test123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
