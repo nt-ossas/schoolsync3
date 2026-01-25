@@ -103,13 +103,22 @@ export function Materia({
 
     if (votiFiltrati.length === 0) return "N/D";
 
-    const somma = votiFiltrati.reduce((acc, v) => {
+    let sommaPonderata = 0;
+    let sommaPesi = 0;
+
+    votiFiltrati.forEach((v) => {
       const votoNum = parseFloat(v.voto);
-      return !isNaN(votoNum) ? acc + votoNum : acc;
-    }, 0);
+      const peso = parseFloat(v.peso || 0);
 
-    const media = somma / votiFiltrati.length;
+      if (!isNaN(votoNum) && !isNaN(peso)) {
+        sommaPonderata += votoNum * peso;
+        sommaPesi += peso;
+      }
+    });
 
+    if (sommaPesi === 0) return "N/D";
+
+    const media = sommaPonderata / sommaPesi;
     return media.toFixed(2);
   };
 
@@ -250,9 +259,9 @@ export function Materia({
                         })
                         .map((voto, index) => {
                           const votoClass =
-                            voto.voto < 6
-                              ? "voto-insufficiente"
-                              : "voto-sufficiente";
+                            voto.voto >= 6 && voto.peso > 0 ? "voto-sufficiente" 
+                            : voto.voto < 6 && voto.peso > 0 ? "voto-insufficiente" 
+                            : voto.peso == 0 ? "voto-nullo" : "voto-nullo"
 
                           return (
                             <div
@@ -263,7 +272,7 @@ export function Materia({
                               <div className="voto-item">
                                 <div className="voto-value">
                                   <span
-                                    className={`voto-badge ${voto.voto >= 6 ? "sufficiente" : "insufficiente"}`}
+                                    className={`voto-badge ${voto.voto >= 6 && voto.peso > 0 ? "sufficiente" : voto.voto < 6 && voto.peso > 0 ? "insufficiente" : voto.peso == 0 ? "nullo" : "nullo"}`}
                                   >
                                     {formatta(voto.voto)}
                                   </span>

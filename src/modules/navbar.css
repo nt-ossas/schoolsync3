@@ -65,7 +65,7 @@
 .profile-avatar {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--accent-green), var(--accent-green), var(--accent-blue));
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-green), var(--accent-blue-secondary));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -73,6 +73,14 @@
   color: white;
   font-weight: 600;
   text-transform: capitalize;
+}
+
+.profile-avatar.insufficiente{
+  background: linear-gradient(135deg, var(--accent-red), var(--accent-red), var(--accent-red-secondary));
+}
+
+.profile-avatar.nullo{
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue), var(--accent-blue-secondary));
 }
 
 .profile-name {

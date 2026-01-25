@@ -64,8 +64,8 @@ export function AggiungiVoto({
     }
 
     const votoNum = parseFloat(formData.voto);
-    if (isNaN(votoNum) || votoNum < 1 || votoNum > 10) {
-      alert("Il voto deve essere un numero tra 1 e 10");
+    if (isNaN(votoNum) || votoNum < 2 || votoNum > 10) {
+      alert("Il voto deve essere un numero tra 2 e 10");
       return;
     }
 
@@ -207,13 +207,13 @@ export function AggiungiVoto({
                 value={formData.peso}
                 onChange={handleChange}
                 placeholder="100"
-                min="10"
+                min="0"
                 max="100"
-                step="10"
+                step="1"
                 required
                 disabled={loading}
               />
-              <span className="helper-text">10-100%</span>
+              <span className="helper-text">0-100%</span>
             </div>
           </div>
 

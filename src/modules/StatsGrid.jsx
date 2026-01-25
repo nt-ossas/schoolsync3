@@ -3,7 +3,7 @@ import './stats.css';
 export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeAnno }) {
 
   const getInsuffText = (num) => {
-    if (!num) return "Nullo";
+    if (!num) return "Nessuna";
     return num + " Insufficienz" + (num == 1 ? "a" : "e");
   };
 

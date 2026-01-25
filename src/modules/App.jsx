@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Login } from "./Login.jsx";
+import { AuthWrapper } from "./AuthWrapper";
 import { Navbar } from "./Navbar.jsx";
 import { Footer } from "./Footer.jsx";
 import { StatsGrid } from "./StatsGrid.jsx";
 import { MaterieList } from "./MaterieList.jsx";
 import "./app.css";
 
-const API_BASE_URL = "https://random.altervista.org/api";
+const API_BASE_URL = "/api";
 
 export function App() {
   const [user, setUser] = useState(null);
@@ -85,7 +85,12 @@ export function App() {
   }
 
   if (!user) {
-    return <Login onLogin={setUser} apiUrl={API_BASE_URL} />;
+    return (
+      <AuthWrapper
+        apiUrl={API_BASE_URL}
+        onLogin={setUser}
+      />
+    );
   }
 
   let schoolCode = "";
@@ -107,7 +112,12 @@ export function App() {
 
   return (
     <div className="app">
-      <Navbar user={user} onLogout={handleLogout} apiUrl={API_BASE_URL} />
+      <Navbar 
+        user={user} 
+        onLogout={handleLogout} 
+        apiUrl={API_BASE_URL} 
+        mediaGenerale={statsData.mediaGenerale}
+      />
 
       <main className="container section">
         <div className="welcome-section">

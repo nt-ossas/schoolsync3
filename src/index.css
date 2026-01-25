@@ -48,6 +48,50 @@
   --transition-slow: 0.4s ease;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Theme - Backgrounds */
+    --system-background: #1b1b1b;
+    --secondary-background: #2c2c2c;
+    --tertiary-background: #3a3a3a;
+    
+    /* Dark Theme - Labels */
+    --label-primary: #ffffff;
+    --label-secondary: #8e8e93;
+    --label-tertiary: #48484a;
+    
+    /* Accent Colors - Primary (più luminosi per dark theme) */
+    --accent-blue: #0a84ff;
+    --accent-green: #30d158;
+    --accent-red: #ff453a;
+    --accent-orange: #ff9f0a;
+    
+    /* Accent Colors - Secondary (più scuri per dark theme) */
+    --accent-blue-secondary: rgba(10, 132, 255, 0.3);
+    --accent-green-secondary: rgba(48, 209, 88, 0.3);
+    --accent-red-secondary: rgba(255, 69, 58, 0.3);
+    --accent-orange-secondary: rgba(255, 159, 10, 0.3);
+    
+    /* Shadows per dark theme (più scuri) */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  }
+
+  select{
+    background-color: var(--system-background) !important;
+    color: var(--label-primary) !important;
+  }
+
+  .navbar{
+    background-color: var(--system-background) !important;
+  }
+
+  .materia-bg{
+    opacity: .05 !important;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;

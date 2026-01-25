@@ -219,8 +219,26 @@
 }
 
 .voto-element.voto-insufficiente .materia-bg{
+  color: var(--accent-red) !important;
   background: var(--accent-red-secondary);
   background: linear-gradient(135deg, var(--accent-red), var(--accent-red), var(--accent-orange-secondary)) !important;
+}
+
+.voto-element.voto-nullo .materia-bg{
+  background: var(--accent-blue-secondary);
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue), var(--accent-blue-secondary)) !important;
+}
+
+.voto-element.voto-sufficiente {
+  color: var(--accent-green) !important;
+}
+
+.voto-element.voto-insufficiente {
+  color: var(--accent-red) !important;
+}
+
+.voto-element.voto-nullo {
+  color: var(--accent-blue) !important;
 }
 
 .voto-item {
@@ -262,6 +280,12 @@
   background: rgba(255, 59, 48, 0.1);
   color: var(--accent-red);
   border: 1px solid rgba(255, 59, 48, 0.2);
+}
+
+.voto-badge.nullo{
+  background: rgba(72, 48, 255, 0.1);
+  color: var(--accent-blue);
+  border: 1px solid rgba(72, 48, 255, 0.2);
 }
 
 .voto-details {
@@ -326,7 +350,6 @@
 
 .voto-periodo, .anno-voto {
   font-size: 0.75rem;
-  color: var(--label-tertiary);
   background: transparent;
   border-radius: var(--radius-sm);
 }

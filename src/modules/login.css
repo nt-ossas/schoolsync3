@@ -419,3 +419,13 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
 }
+
+.link-btn{
+  background-color: transparent !important;
+  border: 0;
+  text-decoration: underline;
+  color: var(--accent-blue);
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 0.75rem;
+}

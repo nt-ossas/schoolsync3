@@ -1,9 +1,12 @@
 import { useState } from "react";
 import "./login.css";
 
-export function Login({ onLogin, apiUrl, switchToSignUp }) {
+export function SignUp({ onLogin, apiUrl, switchToLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [scuola, setScuola] = useState("");
+  const [classe, setClasse] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -13,7 +16,7 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${apiUrl}/login.php`, {
+      const response = await fetch(`${apiUrl}/register.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -21,18 +24,21 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
         body: JSON.stringify({
           email,
           password,
+          username,
+          scuola,
+          classe,
         })
       });
 
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || "Login fallito");
+        throw new Error(data.error || "Registrazione fallita");
       }
 
       onLogin(data.user);
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("SignUp error:", err);
       setError(err.message || "Impossibile connettersi al server");
     } finally {
       setLoading(false);
@@ -45,10 +51,23 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
         <div className="login-header">
           <div className="login-logo">🎓</div>
           <h1 className="login-title">SchoolSync</h1>
-          <p className="login-subtitle">Accedi al tuo account</p>
+          <p className="login-subtitle">Crea un nuovo account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
+
+          <div className="form-group">
+            <label className="form-label">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="input"
+              required
+              disabled={loading}
+            />
+          </div>
+
           <div className="form-group">
             <label className="form-label">Email</label>
             <input
@@ -73,6 +92,30 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
             />
           </div>
 
+          <div className="form-group">
+            <label className="form-label">Scuola</label>
+            <input
+              type="text"
+              value={scuola}
+              onChange={(e) => setScuola(e.target.value)}
+              className="input"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Classe</label>
+            <input
+              type="text"
+              value={classe}
+              onChange={(e) => setClasse(e.target.value)}
+              className="input"
+              required
+              disabled={loading}
+            />
+          </div>
+
           {error && (
             <div className="error-message">
               <i className="icon-error">⚠️</i>
@@ -88,19 +131,19 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
             {loading ? (
               <>
                 <span className="spinner"></span>
-                Accesso in corso...
+                Registrazione in corso...
               </>
             ) : (
-              "Accedi"
+              "Registrati"
             )}
           </button>
         </form>
 
         <div className="login-footer">
           <p>
-            Non hai un account?
-            <button className="link-btn" onClick={switchToSignUp}>
-              Registrati
+            Hai già un account? 
+            <button className="link-btn" onClick={switchToLogin}>
+              Accedi
             </button>
           </p>
         </div>

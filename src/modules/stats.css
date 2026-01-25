@@ -169,7 +169,7 @@
 .stat-bg{
   z-index: -1;
   background: transparent;
-  opacity: .2;
+  opacity: .1;
   filter: blur(9px);
   position: absolute;
   width: 100%;
