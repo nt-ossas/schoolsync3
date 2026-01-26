@@ -1,16 +1,38 @@
-# React + Vite
+# SchoolSync
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SchoolSync è una piattaforma progettata per la gestione e la sincronizzazione delle attività scolastiche, con l’obiettivo di migliorare l’organizzazione, la comunicazione e l’accesso alle informazioni all’interno dell’ambiente educativo.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Descrizione
 
-## React Compiler
+SchoolSync nasce dall’esigenza di centralizzare strumenti e informazioni spesso frammentati in ambito scolastico. La piattaforma fornisce un sistema strutturato e accessibile per coordinare studenti, docenti e gruppi, riducendo la complessità operativa e migliorando l’efficienza complessiva.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Funzionalità principali
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* Gestione centralizzata di attività e obiettivi
+* Accesso da qualsiasi dispositivo
+* Struttura modulare e scalabile
+
+---
+
+## Obiettivi del progetto
+
+* Migliorare l’organizzazione delle attività scolastiche
+* Ridurre la dispersione delle informazioni
+* Fornire uno strumento unico e coerente per la gestione scolastica
+* Offrire una base solida per future estensioni e integrazioni
+
+---
+
+## Stato del progetto
+
+Il progetto è in fase di sviluppo attivo. Le funzionalità e l’architettura sono soggette a evoluzioni e miglioramenti continui.
+
+---
+
+## Licenza
+
+Il tipo di licenza verrà definito in una fase successiva del progetto.
