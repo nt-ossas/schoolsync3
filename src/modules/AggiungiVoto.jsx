@@ -231,9 +231,12 @@ export function AggiungiVoto({
                 required
                 disabled={loading}
               >
-                <option value="Scritto">📝 Scritto</option>
-                <option value="Orale">🗣️ Orale</option>
-                <option value="Pratico">🔧 Pratico</option>
+                <option value="Scritto">Scritto
+                </option>
+                <option value="Orale">Orale
+                </option>
+                <option value="Pratico">Pratico
+                </option>
               </select>
             </div>
 
@@ -266,8 +269,8 @@ export function AggiungiVoto({
               required
               disabled={loading}
             >
-              <option value="0">📅 Primo Periodo</option>
-              <option value="1">📅 Secondo Periodo</option>
+              <option value="0"> Primo Periodo</option>
+              <option value="1"> Secondo Periodo</option>
             </select>
           </div>
 

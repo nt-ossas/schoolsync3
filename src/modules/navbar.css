@@ -22,6 +22,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  cursor: pointer;
 }
 
 .navbar-logo {
@@ -102,4 +103,10 @@
 
 .fa-arrow-right-from-bracket{
   rotate: 180deg;
+}
+
+@media (max-width: 768px) {
+  .navbar-title{
+    display: none;
+  }
 }

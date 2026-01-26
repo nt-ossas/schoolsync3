@@ -5,10 +5,10 @@ export function Materia({
   materia,
   user_id,
   apiUrl,
-  onAddVoto,
   periodo,
   onVotiAggiornati,
   onEliminaMateria,
+  handleRinominaMateria
 }) {
   const [expanded, setExpanded] = useState(false);
   const [voti, setVoti] = useState([]);
@@ -238,14 +238,6 @@ export function Materia({
                       nessun voto registrato{" "}
                       {periodo !== null ? `per questo periodo` : ""}
                     </p>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        if (onAddVoto) onAddVoto();
-                      }}
-                    >
-                      + Aggiungi il primo voto
-                    </button>
                   </div>
                 ) : (
                   <>
@@ -282,10 +274,10 @@ export function Materia({
                                   <div className="voto-tipo">
                                     <span className="tipo-icon">
                                       {voto.tipo === "Scritto"
-                                        ? "📝"
+                                        ? <i className="fa-solid fa-file-lines"></i>
                                         : voto.tipo === "Orale"
-                                          ? "🗣️"
-                                          : "🔧"}
+                                          ? <i className="fa-solid fa-volume-high"></i>
+                                          : <i className="fa-solid fa-wrench"></i>}
                                     </span>
                                     {voto.tipo}
                                   </div>
@@ -331,18 +323,32 @@ export function Materia({
                   </>
                 )}
               </div>
-              <button
-                className="delete-btn-text btn btn-primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onEliminaMateria) {
-                    onEliminaMateria(materia.id);
-                  }
-                }}
-                title="Elimina materia"
-              >
-                - Elimina materia
-              </button>
+              <div className="btns">
+                <button
+                  className="delete-btn-text btn btn-primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onEliminaMateria) {
+                      onEliminaMateria(materia.id);
+                    }
+                  }}
+                  title="Elimina materia"
+                >
+                  - Elimina
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (handleRinominaMateria) {
+                      handleRinominaMateria(materia.id);
+                    }
+                  }}
+                  title="Rinomina materia"
+                >
+                  <i className="fas fa-pencil"></i> Rinomina
+                </button>
+              </div>
             </>
           )}
         </div>

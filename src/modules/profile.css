@@ -1,0 +1,162 @@
+.profile-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+}
+
+.info-user {
+  width: 100%;
+}
+
+.info-card {
+  background: var(--system-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  width: 100%;
+}
+
+.info-card h2 {
+  margin-bottom: var(--spacing-md);
+}
+
+.info-list {
+  list-style: none;
+  display: grid;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+  padding: 0;
+}
+
+.profile-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.profile button {
+  height: 40px;
+}
+
+/* Label + input layout */
+.profile-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: var(--label-secondary);
+  flex: 1 1 250px; /* grow, shrink, basis */
+}
+
+/* Inputs: riuso lo stile "input" del tuo index.css */
+.profile-form input {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--label-tertiary);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-family: inherit;
+  background: var(--system-background);
+  color: var(--label-primary);
+  transition: all var(--transition-fast);
+}
+
+.profile-form input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+/* View mode: input read-only */
+.profile-form input:read-only {
+  background: var(--secondary-background);
+  border-color: transparent;
+  color: var(--label-primary);
+  cursor: default; /* read-only: non “text cursor” */
+} /* :read-only pseudo-class [web:56] */
+
+.profile-form input:read-only:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+/* Edit mode: input scrivibili */
+.profile-form input:read-write {
+  background: var(--system-background);
+  cursor: text;
+} /* :read-write / :read-only pair [web:69] */
+
+.btns {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: var(--spacing-md);
+}
+
+/* Buttons area */
+.btns button {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+/* Stile base per i bottoni che usi nel componente */
+.btns button[type="button"] {
+  background: var(--secondary-background);
+  color: var(--label-primary);
+}
+
+.btns button[type="button"]:hover {
+  background: var(--tertiary-background);
+}
+
+.btns button[type="submit"] {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.btns button[type="submit"]:hover {
+  background: #0066d6;
+}
+
+.btns button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Messaggi */
+.error {
+  color: var(--accent-red);
+  background: var(--accent-red-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.success {
+  color: var(--accent-green);
+  background: var(--accent-green-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .info-card {
+    padding: var(--spacing-lg);
+  }
+
+  .welcome-title {
+    font-size: 1.8rem;
+  }
+}

@@ -60,6 +60,41 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
     }
   };
 
+  const handleRinominaMateria = async (materiaId) => {
+    alert("Funzione di rinomina materia in sviluppo.");
+
+    /*const nuovaNome = window.prompt("Inserisci il nuovo nome della materia:");
+
+    if (!nuovaNome || nuovaNome.trim() === "") {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/rinomina_materia.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          materia_id: materiaId,
+          nuovo_nome: nuovaNome.trim(),
+        }),
+      });
+
+      const responseText = await response.text();
+      const data = JSON.parse(responseText);
+      if (data.success) {
+        caricaMaterie();
+      } else {
+        alert(`Errore: ${data.error || "Errore sconosciuto"}`);
+      }
+    } catch (err) {
+      console.error("Errore rinomina materia:", err);
+      alert("Errore di connessione al server: " + err.message);
+    }*/
+  };
+
   const calcolaStatisticheFiltrate = useCallback(() => {
     let totVoti = 0;
     let sommaVoti = 0;
@@ -302,6 +337,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
             periodo={periodo}
             onVotiAggiornati={handleVotiAggiornati}
             onEliminaMateria={handleEliminaMateria}
+            onRinominaMateria={handleRinominaMateria}
           />
         ))}
       </div>

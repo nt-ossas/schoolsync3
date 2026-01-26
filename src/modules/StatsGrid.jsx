@@ -1,67 +1,69 @@
-import './stats.css';
+import "./stats.css";
 
 export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeAnno }) {
-
   const getInsuffText = (num) => {
     if (!num) return "Nessuna";
-    return num + " Insufficienz" + (num == 1 ? "a" : "e");
+    return `${num} Insufficienz${num === 1 ? "a" : "e"}`;
   };
+
+  const mediaNumber =
+    statsData.mediaGenerale === "N/D" || statsData.mediaGenerale == null
+      ? null
+      : Number(statsData.mediaGenerale);
+
+  const mediaColor =
+    mediaNumber === null
+      ? "var(--accent-blue)"
+      : mediaNumber >= 6
+        ? "var(--accent-green)"
+        : "var(--accent-red)";
+
+  const mediaBgClass =
+    mediaNumber === null ? "media-nulla" : mediaNumber >= 6 ? "media-sufficiente" : "media-insufficiente";
+
+  const insuffBgClass = statsData.materieInsuff >= 1 ? "media-insufficiente" : "media-nulla";
 
   const stats = [
     {
       title: "Media Generale",
       value: statsData.mediaGenerale || "N/D",
-      icon: "📈",
-      color: statsData.mediaGenerale === "N/D" 
-        ? "var(--accent-blue)" 
-        : parseFloat(statsData.mediaGenerale) >= 6 
-          ? "var(--accent-green)" 
-          : "var(--accent-red)",
-      type: "media"
+      icon: <i className="fa-solid fa-user-graduate" />,
+      color: mediaColor,
+      bgClass: mediaBgClass,
+      type: "media",
     },
     {
       title: "Anno Scolastico",
-      value: null,
-      icon: "📅",
-      color: "var(--text-color)",
-      type: "anno"
+      icon: <i className="fa fa-calendar" />,
+      color: "var(--label-primary)",
+      bgClass: "media-nulla",
+      type: "anno",
     },
     {
       title: "Periodo",
-      value: null,
-      icon: "📚",
-      color: "var(--text-color)",
-      type: "periodo"
+      icon: periodo === 0 ? <i className="fas fa-hourglass-start" /> : <i className="fas fa-hourglass-end" />,
+      color: "var(--label-primary)",
+      bgClass: "media-nulla",
+      type: "periodo",
     },
     {
       title: "Materie Insufficienti",
       value: getInsuffText(statsData.materieInsuff),
-      icon: statsData.materieInsuff >= 1 ? "⚠️" : "✅",
-      color: statsData.materieInsuff >= 1 
-        ? "var(--accent-red)" 
-        : "var(--accent-green)",
-      type: "insufficienti"
-    }
+      icon: statsData.materieInsuff >= 1 ? <i className="fa-solid fa-triangle-exclamation"></i> : <i className="fa-solid fa-square-check"></i>,
+      color: statsData.materieInsuff >= 1 ? "var(--accent-red)" : "var(--accent-green)",
+      bgClass: insuffBgClass,
+      type: "insufficienti",
+    },
   ];
 
   return (
     <div className="stats-grid">
       {stats.map((stat, index) => (
         <div key={index} className="stat-card">
-          
-          <div className={"stat-bg " + (
-            stat.type === "media"
-              ? (stat.value >= 6 ? "media-sufficiente" : stat.value < 6 ? "media-insufficiente" : "media-nulla")
-              : stat.type === "insufficienti"
-                ? (statsData.materieInsuff >= 1 ? "media-insufficiente" : "media-nulla")
-                : "media-nulla"
-          )}></div>
+          <div className={"stat-bg " + stat.bgClass} />
 
           <div className="stat-header">
-            <div 
-              className="stat-icon" 
-              style={{ backgroundColor: `${stat.color}15` }}
-            >
+            <div className="stat-icon" style={{ backgroundColor: `${stat.color}15` }}>
               <span style={{ color: stat.color }}>{stat.icon}</span>
             </div>
 
@@ -69,11 +71,11 @@ export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeA
               <h3 className="stat-title">{stat.title}</h3>
 
               {stat.type === "anno" ? (
-                <select 
-                  name="anno" 
-                  id="anno" 
+                <select
+                  name="anno"
+                  id="anno"
                   value={anno ?? ""}
-                  onChange={event => onChangeAnno(event.target.value ? Number(event.target.value) : null)}
+                  onChange={(event) => onChangeAnno(event.target.value ? Number(event.target.value) : null)}
                   className="stat-value"
                   style={{ color: stat.color }}
                   onClick={(e) => e.stopPropagation()}
@@ -88,11 +90,11 @@ export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeA
                   <option value="6">2029-30</option>
                 </select>
               ) : stat.type === "periodo" ? (
-                <select 
-                  name="periodo" 
-                  id="periodo" 
+                <select
+                  name="periodo"
+                  id="periodo"
                   value={periodo === null ? "tutti" : periodo}
-                  onChange={event => {
+                  onChange={(event) => {
                     const value = event.target.value;
                     onChangePeriodo(value === "tutti" ? null : Number(value));
                   }}
@@ -104,17 +106,11 @@ export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeA
                   <option value="0">Primo</option>
                   <option value="1">Secondo</option>
                 </select>
-              ) : stat.type === "media" ? (
-                <p className="stat-value media" style={{ color: stat.color }}>
-                  {stat.value}
-                </p>
-
               ) : (
-                <p className="stat-value" style={{ color: stat.color }}>
+                <p className={"stat-value" + (stat.type === "media" ? " media" : "")} style={{ color: stat.color }}>
                   {stat.value}
                 </p>
               )}
-
             </div>
           </div>
         </div>

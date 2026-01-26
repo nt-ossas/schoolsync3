@@ -14,19 +14,28 @@
 
 /* Effetto background animato */
 .login-container::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 200%;
   height: 200%;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  background:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
   animation: backgroundMove 20s ease infinite;
   z-index: 0;
 }
 
 @keyframes backgroundMove {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0, 0);
   }
   50% {
@@ -39,7 +48,7 @@
   position: relative;
   z-index: 1;
   background: var(--system-background);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 420px;
@@ -71,7 +80,8 @@
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -142,6 +152,14 @@
   color: var(--label-tertiary);
 }
 
+.error-container {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
 /* Error message */
 .error-message {
   display: flex;
@@ -153,13 +171,21 @@
   border-radius: var(--radius-md);
   color: var(--accent-red);
   font-size: 0.875rem;
+  margin-block: 25px;
   animation: shake 0.4s ease;
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
 }
 
 .icon-error {
@@ -280,7 +306,7 @@
 
 .form-divider::before,
 .form-divider::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--tertiary-background);
@@ -410,7 +436,7 @@
 }
 
 .form-loading::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -420,7 +446,7 @@
   border-radius: var(--radius-md);
 }
 
-.link-btn{
+.link-btn {
   background-color: transparent !important;
   border: 0;
   text-decoration: underline;

@@ -27,7 +27,7 @@ export function SignUp({ onLogin, apiUrl, switchToLogin }) {
           username,
           scuola,
           classe,
-        })
+        }),
       });
 
       const data = await response.json();
@@ -49,13 +49,14 @@ export function SignUp({ onLogin, apiUrl, switchToLogin }) {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <div className="login-logo">🎓</div>
+          <div className="login-logo">
+            <i className="fa-solid fa-graduation-cap"></i>
+          </div>
           <h1 className="login-title">SchoolSync</h1>
           <p className="login-subtitle">Crea un nuovo account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
-
           <div className="form-group">
             <label className="form-label">Username</label>
             <input
@@ -141,7 +142,7 @@ export function SignUp({ onLogin, apiUrl, switchToLogin }) {
 
         <div className="login-footer">
           <p>
-            Hai già un account? 
+            Hai già un account?
             <button className="link-btn" onClick={switchToLogin}>
               Accedi
             </button>

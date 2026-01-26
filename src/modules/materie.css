@@ -68,3 +68,20 @@
 .header-info{
   text-transform: capitalize;
 }
+
+@media (max-width: 768px) {
+  .header-info h2{
+    display: none;
+  }
+
+  .flex{
+    width: 100%;
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .materie-section {
+    margin-top: var(--spacing-md);
+  }
+}

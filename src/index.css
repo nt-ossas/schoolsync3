@@ -32,9 +32,7 @@
   --spacing-2xl: 48px;
   
   /* Border radius */
-  --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 20px;
   --radius-full: 9999px;
   
   /* Shadows */
@@ -52,7 +50,7 @@
   :root {
     /* Dark Theme - Backgrounds */
     --system-background: #1b1b1b;
-    --secondary-background: #2c2c2c;
+    --secondary-background: #222222;
     --tertiary-background: #3a3a3a;
     
     /* Dark Theme - Labels */
@@ -166,7 +164,7 @@ p {
 
 .card {
   background: var(--system-background);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
 }

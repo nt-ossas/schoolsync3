@@ -4,11 +4,13 @@ import { Navbar } from "./Navbar.jsx";
 import { Footer } from "./Footer.jsx";
 import { StatsGrid } from "./StatsGrid.jsx";
 import { MaterieList } from "./MaterieList.jsx";
+import { Profile } from "./Profile.jsx";
 import "./app.css";
 
 const API_BASE_URL = "/api";
 
 export function App() {
+  const [page, setPage] = useState("materie");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statsData, setStatsData] = useState({
@@ -24,6 +26,7 @@ export function App() {
       try {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
+        console.log("Utente caricato da localStorage:", parsedUser);
       } catch (e) {
         console.error("errore nel parsing dell'utente:", e);
         localStorage.removeItem("schoolsync_user");
@@ -34,13 +37,10 @@ export function App() {
 
   useEffect(() => {
     if (user) {
-      const userToSave = {
-        ...user,
-        statsData: statsData,
-      };
+      const userToSave = { ...user, statsData };
       localStorage.setItem("schoolsync_user", JSON.stringify(userToSave));
     }
-  }, [user, statsData]);
+  }, [user, statsData]); // sync localStorage quando cambia state [web:142][web:139]
 
   const handleUpdateStats = (newStats) => {
     setStatsData((prev) => ({ ...prev, ...newStats }));
@@ -57,11 +57,14 @@ export function App() {
     localStorage.removeItem("schoolsync_user");
   }
 
+  function handlePage(newPage) {
+    setPage(newPage);
+  }
+
   const getAnnoDefault = () => {
     const oggi = new Date();
     const annoCorrente = oggi.getFullYear();
     const mese = oggi.getMonth() + 1;
-
     const annoScolastico = mese >= 9 ? annoCorrente : annoCorrente - 1;
     return annoScolastico - 2023;
   };
@@ -85,21 +88,11 @@ export function App() {
   }
 
   if (!user) {
-    return (
-      <AuthWrapper
-        apiUrl={API_BASE_URL}
-        onLogin={setUser}
-      />
-    );
+    return <AuthWrapper apiUrl={API_BASE_URL} onLogin={setUser} />;
   }
 
   let schoolCode = "";
-
-  switch (
-    String(user.school || "")
-      .trim()
-      .toLowerCase()
-  ) {
+  switch (String(user.school || "").trim().toLowerCase()) {
     case "b":
       schoolCode = "I.I.S. Blaise Pascal";
       break;
@@ -107,22 +100,23 @@ export function App() {
       schoolCode = "S. D'Arzo";
       break;
     default:
-      schoolCode = "N/D";
+      schoolCode = user.school || "N/D";
   }
 
   return (
     <div className="app">
-      <Navbar 
-        user={user} 
-        onLogout={handleLogout} 
-        apiUrl={API_BASE_URL} 
+      <Navbar
+        user={user}
+        onLogout={handleLogout}
         mediaGenerale={statsData.mediaGenerale}
+        handlePage={handlePage}
       />
 
       <main className="container section">
         <div className="welcome-section">
           <h1 className="welcome-title">
-            ciao, <span className="capitalize">{user.username}</span>👋
+            ciao, <span className="capitalize">{user.username} </span> 
+            <i className="fa-solid fa-hand-peace"></i>
           </h1>
           <p className="welcome-subtitle">
             {user.classe ? `Classe ${user.classe}` : ""} • {schoolCode}
@@ -130,8 +124,6 @@ export function App() {
         </div>
 
         <StatsGrid
-          user={user}
-          apiUrl={API_BASE_URL}
           statsData={statsData}
           periodo={periodo}
           anno={anno}
@@ -139,17 +131,25 @@ export function App() {
           onChangeAnno={setAnno}
         />
 
-        <div className="materie-section">
-          <MaterieList
+        {page === "materie" ? (
+          <div className="materie-section">
+            <MaterieList
+              user={user}
+              apiUrl={API_BASE_URL}
+              onUpdateStats={handleUpdateStats}
+              periodo={periodo}
+              anno={anno}
+            />
+          </div>
+        ) : (
+          <Profile
             user={user}
-            apiUrl={API_BASE_URL}
-            onUpdateStats={handleUpdateStats}
-            periodo={periodo}
-            anno={anno}
+            onUserUpdated={(updatedUser) => {
+              setUser((prev) => ({ ...prev, ...updatedUser }));
+            }}
           />
-        </div>
+        )}
       </main>
-
       <Footer />
     </div>
   );
