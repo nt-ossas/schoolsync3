@@ -45,9 +45,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
         }),
       });
 
-      const responseText = await response.text();
-
-      const data = JSON.parse(responseText);
+      const data = await response.json();
 
       if (data.success) {
         caricaMaterie();
@@ -60,14 +58,8 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
     }
   };
 
-  const handleRinominaMateria = async (materiaId) => {
-    alert("Funzione di rinomina materia in sviluppo.");
-
-    /*const nuovaNome = window.prompt("Inserisci il nuovo nome della materia:");
-
-    if (!nuovaNome || nuovaNome.trim() === "") {
-      return;
-    }
+  const handleRinominaMateria = async (materiaId, nuovoNome) => {
+    if (!nuovoNome || nuovoNome.trim() === "") return;
 
     try {
       const response = await fetch(`${apiUrl}/rinomina_materia.php`, {
@@ -77,22 +69,23 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
         },
         body: JSON.stringify({
           user_id: user.id,
-          materia_id: materiaId,
-          nuovo_nome: nuovaNome.trim(),
+          id_materia: materiaId,
+          nuovo_nome: nuovoNome.trim(),
         }),
       });
 
-      const responseText = await response.text();
-      const data = JSON.parse(responseText);
+      const data = await response.json();
+
       if (data.success) {
         caricaMaterie();
+        alert("Materia rinominata con successo!");
       } else {
         alert(`Errore: ${data.error || "Errore sconosciuto"}`);
       }
     } catch (err) {
       console.error("Errore rinomina materia:", err);
-      alert("Errore di connessione al server: " + err.message);
-    }*/
+      alert("Errore di connessione al server");
+    }
   };
 
   const calcolaStatisticheFiltrate = useCallback(() => {
@@ -105,7 +98,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
       if (anno === undefined || anno === null) {
         return true;
       }
-      return materia.anno === anno;
+      return materia.anno == anno;
     });
 
     materieFiltratePerAnno.forEach((materia) => {
@@ -115,24 +108,28 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
         if (periodo === undefined || periodo === null) {
           return true;
         }
-        return voto.periodo === periodo;
+        return voto.periodo == periodo;
       });
 
       totVoti += votiFiltrati.length;
 
       if (votiFiltrati.length > 0) {
         let sommaVotiMateria = 0;
+        let sommaPesi = 0;
 
         votiFiltrati.forEach((voto) => {
           const votoNum = parseFloat(voto.voto);
-          if (!isNaN(votoNum)) {
-            sommaVotiMateria += votoNum;
-            sommaVoti += votoNum;
-            countVoti++;
+          const peso = parseFloat(voto.peso || 1);
+          
+          if (!isNaN(votoNum) && !isNaN(peso) && peso > 0) {
+            sommaVotiMateria += votoNum * peso;
+            sommaPesi += peso;
+            sommaVoti += votoNum * peso;
+            countVoti += peso;
           }
         });
 
-        const mediaMateria = sommaVotiMateria / votiFiltrati.length;
+        const mediaMateria = sommaPesi > 0 ? sommaVotiMateria / sommaPesi : 0;
 
         if (mediaMateria < 6) {
           materieInsuff++;
@@ -140,8 +137,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
       }
     });
 
-    const mediaGenerale =
-      countVoti > 0 ? (sommaVoti / countVoti).toFixed(2) : "N/D";
+    const mediaGenerale = countVoti > 0 ? (sommaVoti / countVoti).toFixed(2) : "N/D";
 
     return {
       materieTotali: materieFiltratePerAnno.length,
@@ -168,7 +164,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
     if (onUpdateStats) {
       onUpdateStats(nuoveStats);
     }
-  }, [materie, votiPerMateria, periodo, anno]);
+  }, [materie, votiPerMateria, periodo, anno, calcolaStatisticheFiltrate]);
 
   async function caricaMaterie() {
     if (!user?.id) return;
@@ -228,7 +224,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
           <span className="error-icon">⚠️</span>
           <p className="error-message">{error}</p>
           <button className="btn btn-primary" onClick={() => caricaMaterie()}>
-            🔄 Riprova
+            Riprova
           </button>
         </div>
       </div>
@@ -266,7 +262,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
     if (anno === null || anno === undefined) {
       return true;
     }
-    return materia.anno === anno;
+    return materia.anno == anno;
   });
 
   if (materieVisibili.length === 0) {
@@ -276,7 +272,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
           <span className="empty-icon">🔍</span>
           <h3>Nessuna materia per l'anno selezionato</h3>
           <p>
-            Aggiungi una materia per l'anno {2022 + anno}-{2023 + anno}
+            Aggiungi una materia per l'anno {2023 + parseInt(anno)}-{2024 + parseInt(anno)}
           </p>
           <button
             className="btn btn-primary btn-large"
@@ -310,10 +306,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
         <div className="flex">
           <button
             className="btn btn-small btn-primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (handleOpenAddVoto) handleOpenAddVoto();
-            }}
+            onClick={() => handleOpenAddVoto()}
           >
             + Aggiungi voto
           </button>
@@ -337,7 +330,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
             periodo={periodo}
             onVotiAggiornati={handleVotiAggiornati}
             onEliminaMateria={handleEliminaMateria}
-            onRinominaMateria={handleRinominaMateria}
+            handleRinominaMateria={handleRinominaMateria}
           />
         ))}
       </div>

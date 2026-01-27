@@ -3,7 +3,7 @@ import "./stats.css";
 export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeAnno }) {
   const getInsuffText = (num) => {
     if (!num) return "Nessuna";
-    return `${num} Insufficienz${num === 1 ? "a" : "e"}`;
+    return `ficienz${num === 1 ? "a" : "e"}`;
   };
 
   const mediaNumber =
@@ -16,12 +16,14 @@ export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeA
       ? "var(--accent-blue)"
       : mediaNumber >= 6
         ? "var(--accent-green)"
-        : "var(--accent-red)";
+        : mediaNumber >= 5
+          ? "var(--accent-orange)"
+          : "var(--accent-red)";
 
   const mediaBgClass =
-    mediaNumber === null ? "media-nulla" : mediaNumber >= 6 ? "media-sufficiente" : "media-insufficiente";
+    mediaNumber === null ? "media-nulla" : mediaNumber >= 6 ? "media-sufficiente" : mediaNumber >= 5 ? "media-mid" : "media-insufficiente";
 
-  const insuffBgClass = statsData.materieInsuff >= 1 ? "media-insufficiente" : "media-nulla";
+  const insuffBgClass = statsData.materieInsuff >= 3 ? "media-insufficiente" : statsData.materieInsuff >= 1 ? "media-mid" : mediaNumber === null ? "media-nulla" : "media-sufficiente";
 
   const stats = [
     {
@@ -48,9 +50,9 @@ export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeA
     },
     {
       title: "Materie Insufficienti",
-      value: getInsuffText(statsData.materieInsuff),
+      value: <>{statsData.materieInsuff} Insuf<span className="short">{getInsuffText(statsData.materieInsuff)}</span></>,
       icon: statsData.materieInsuff >= 1 ? <i className="fa-solid fa-triangle-exclamation"></i> : <i className="fa-solid fa-square-check"></i>,
-      color: statsData.materieInsuff >= 1 ? "var(--accent-red)" : "var(--accent-green)",
+      color: statsData.materieInsuff >= 3 ? "var(--accent-red)" : statsData.materieInsuff >= 1 ? "var(--accent-orange)" : "var(--accent-green)",
       bgClass: insuffBgClass,
       type: "insufficienti",
     },

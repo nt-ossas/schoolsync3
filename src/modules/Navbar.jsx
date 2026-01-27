@@ -5,7 +5,7 @@ export function Navbar({ user, onLogout, mediaGenerale, handlePage }) {
     if (isNaN(mediaGenerale)) {
       return "nullo";
     }
-    return mediaGenerale >= 6 ? "sufficiente" : "insufficiente";
+    return mediaGenerale >= 6 ? "sufficiente" : mediaGenerale >= 5 ? "mid" : "insufficiente";
   };
 
   return (

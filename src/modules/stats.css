@@ -88,6 +88,10 @@
   color: var(--accent-red) !important;
 }
 
+.media-mid {
+  color: var(--accent-orange) !important;
+}
+
 .media-sufficiente {
   color: var(--accent-green) !important;
 }
@@ -98,6 +102,10 @@
 
 .materia-card.media-insufficiente {
   border-left: 4px solid var(--accent-red);
+}
+
+.materia-card.media-mid {
+  border-left: 4px solid var(--accent-orange);
 }
 
 .materia-card.media-sufficiente {
@@ -197,6 +205,15 @@
   ) !important;
 }
 
+.stat-bg.media-mid {
+  background: linear-gradient(
+    135deg,
+    var(--accent-orange),
+    var(--accent-orange),
+    var(--accent-orange-secondary)
+  ) !important;
+}
+
 .stat-bg.media-nulla {
   background: linear-gradient(
     135deg,
@@ -204,4 +221,10 @@
     var(--accent-blue),
     var(--accent-blue-secondary)
   ) !important;
+}
+
+@media (max-width: 768px) {
+  .short{
+    display: none;
+  }
 }

@@ -80,6 +80,10 @@
   background: linear-gradient(135deg, var(--accent-red), var(--accent-red), var(--accent-red-secondary));
 }
 
+.profile-avatar.mid{
+  background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange), var(--accent-orange-secondary));
+}
+
 .profile-avatar.nullo{
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue), var(--accent-blue-secondary));
 }
