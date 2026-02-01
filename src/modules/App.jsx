@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useState } from "react";
 import { AuthWrapper } from "./AuthWrapper";
 import { Navbar } from "./Navbar.jsx";
 import { Footer } from "./Footer.jsx";
 import { StatsGrid } from "./StatsGrid.jsx";
 import { MaterieList } from "./MaterieList.jsx";
 import { Profile } from "./Profile.jsx";
+import { Versions } from "./Versions.jsx";
+import { UltimiVoti } from "./UltimiVoti.jsx";
+//import { Miracolo } from "./Miracolo.jsx";
 import "./app.css";
 
 const API_BASE_URL = "/api";
@@ -19,6 +23,19 @@ export function App() {
     votiTotali: 0,
     materieInsuff: 0,
   });
+  
+  // Stato per refresh automatico di UltimiVoti
+  const [ultimiVotiKey, setUltimiVotiKey] = useState(0);
+  
+  const caricaTema = () => {
+    /*const temaSalvato = localStorage.getItem("theme");
+    if (temaSalvato) {
+      import("./themes/" + temaSalvato + ".css")
+    } else {
+      import("./themes/dark.css")
+    }*/
+    alert("Funzione tema non ancora implementata.");
+  };
 
   useEffect(() => {
     const savedUser = localStorage.getItem("schoolsync_user");
@@ -26,12 +43,13 @@ export function App() {
       try {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
-        console.log("Utente caricato da localStorage:", parsedUser);
+        console.log("Utente caricato da localStorage:", parsedUser)
       } catch (e) {
         console.error("errore nel parsing dell'utente:", e);
         localStorage.removeItem("schoolsync_user");
       }
     }
+    //caricaTema();
     setLoading(false);
   }, []);
 
@@ -40,10 +58,16 @@ export function App() {
       const userToSave = { ...user, statsData };
       localStorage.setItem("schoolsync_user", JSON.stringify(userToSave));
     }
-  }, [user, statsData]); // sync localStorage quando cambia state [web:142][web:139]
+  }, [user, statsData]);
 
   const handleUpdateStats = (newStats) => {
     setStatsData((prev) => ({ ...prev, ...newStats }));
+  };
+
+  // Funzione per forzare il refresh di UltimiVoti
+  const refreshUltimiVoti = () => {
+    setUltimiVotiKey(prev => prev + 1);
+    console.log("Refresh UltimiVoti chiamato");
   };
 
   function handleLogout() {
@@ -55,10 +79,6 @@ export function App() {
       materieInsuff: 0,
     });
     localStorage.removeItem("schoolsync_user");
-  }
-
-  function handlePage(newPage) {
-    setPage(newPage);
   }
 
   const getAnnoDefault = () => {
@@ -77,6 +97,45 @@ export function App() {
 
   const [anno, setAnno] = useState(getAnnoDefault());
   const [periodo, setPeriodo] = useState(getPeriodoDefault());
+
+  // Gestione del contenuto della pagina in base allo stato `page`
+  let pageContent;
+  switch (page) {
+    case "materie":
+      pageContent = (
+        <MaterieList
+          user={user}
+          apiUrl={API_BASE_URL}
+          onUpdateStats={handleUpdateStats}
+          periodo={periodo}
+          anno={anno}
+          onVotiModificati={refreshUltimiVoti} // Passa la funzione di refresh
+        />
+      );
+      break;
+    case "profile":
+      pageContent = (
+        <Profile 
+          user={user}
+          onLogout={handleLogout}
+          onUserUpdated={(updatedUser) => {setUser((prev) => ({ ...prev, ...updatedUser }));}}
+          caricaTema={caricaTema}
+        />
+      );
+      break;
+    case "versions":
+      pageContent = (
+        <Versions 
+          user={user}
+        />
+      );
+      break;
+    /*case "miracolo":
+      pageContent = <Miracolo />;
+      break;*/
+    default:
+      pageContent = null;
+  }
 
   if (loading) {
     return (
@@ -107,9 +166,10 @@ export function App() {
     <div className="app">
       <Navbar
         user={user}
-        onLogout={handleLogout}
         mediaGenerale={statsData.mediaGenerale}
-        handlePage={handlePage}
+        onPageChange={setPage}
+        anno={anno}
+        onChangeAnno={setAnno}
       />
 
       <main className="container section">
@@ -123,34 +183,28 @@ export function App() {
           </p>
         </div>
 
-        <StatsGrid
-          statsData={statsData}
-          periodo={periodo}
-          anno={anno}
-          onChangePeriodo={setPeriodo}
-          onChangeAnno={setAnno}
-        />
-
-        {page === "materie" ? (
-          <div className="materie-section">
-            <MaterieList
-              user={user}
-              apiUrl={API_BASE_URL}
-              onUpdateStats={handleUpdateStats}
-              periodo={periodo}
-              anno={anno}
-            />
-          </div>
-        ) : (
-          <Profile
-            user={user}
-            onUserUpdated={(updatedUser) => {
-              setUser((prev) => ({ ...prev, ...updatedUser }));
-            }}
+        <div className="flex-header">
+          <StatsGrid
+            statsData={statsData}
+            periodo={periodo}
+            anno={anno}
+            onChangePeriodo={setPeriodo}
+            onChangeAnno={setAnno}
           />
-        )}
+
+          <UltimiVoti 
+            key={ultimiVotiKey}
+            user={user} 
+            anno={anno}
+            apiUrl={API_BASE_URL} 
+          />
+        </div>
+
+        {pageContent}
       </main>
-      <Footer />
+      <Footer 
+        onPageChange={setPage} 
+      />
     </div>
   );
 }

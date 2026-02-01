@@ -4,7 +4,14 @@ import { AggiungiVoto } from "./AggiungiVoto.jsx";
 import { AggiungiMateria } from "./AggiungiMateria.jsx";
 import "./materie.css";
 
-export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
+export function MaterieList({ 
+  user, 
+  apiUrl, 
+  onUpdateStats, 
+  periodo, 
+  anno,
+  onVotiModificati // Nuova prop per notificare modifiche voti
+}) {
   const [materie, setMaterie] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,6 +56,10 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
 
       if (data.success) {
         caricaMaterie();
+        // Notifica che i voti potrebbero essere cambiati
+        if (onVotiModificati) {
+          onVotiModificati();
+        }
       } else {
         alert(`Errore: ${data.error || "Errore sconosciuto"}`);
       }
@@ -94,9 +105,10 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
     let countVoti = 0;
     let materieInsuff = 0;
 
+    // Filtra materie per anno (se anno >= 0)
     const materieFiltratePerAnno = materie.filter((materia) => {
-      if (anno === undefined || anno === null) {
-        return true;
+      if (anno === -1 || anno === null || anno === undefined) {
+        return true; // Mostra tutte le materie quando anno = -1
       }
       return materia.anno == anno;
     });
@@ -199,6 +211,10 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
 
   const handleVotoAggiunto = () => {
     caricaMaterie();
+    // Notifica che un voto è stato aggiunto
+    if (onVotiModificati) {
+      onVotiModificati();
+    }
   };
 
   const handleMateriaAggiunta = () => {
@@ -258,18 +274,19 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
     );
   }
 
+  // Filtra le materie visibili in base all'anno
   const materieVisibili = materie.filter((materia) => {
-    if (anno === null || anno === undefined) {
-      return true;
+    if (anno === -1 || anno === null || anno === undefined) {
+      return true; // Mostra tutte le materie quando anno = -1
     }
     return materia.anno == anno;
   });
 
-  if (materieVisibili.length === 0) {
+  if (anno !== -1 && materieVisibili.length === 0) {
     return (
       <div className="materie-list empty">
         <div className="empty-container">
-          <span className="empty-icon">🔍</span>
+          <span className="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
           <h3>Nessuna materia per l'anno selezionato</h3>
           <p>
             Aggiungi una materia per l'anno {2023 + parseInt(anno)}-{2024 + parseInt(anno)}
@@ -294,22 +311,24 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
     );
   }
 
+  // Testo del titolo
+  const titolo = anno === -1 
+    ? `${materieVisibili.length} ${materieVisibili.length === 1 ? 'materia' : 'materie'} totali`
+    : `${materieVisibili.length} ${materieVisibili.length === 1 ? 'materia' : 'materie'} (A.S. ${2023 + parseInt(anno)}-${2024 + parseInt(anno)})`;
+
   return (
     <div className="materie-list">
       <div className="materie-header">
         <div className="header-info">
-          <h2>
-            {materieVisibili.length}{" "}
-            {materieVisibili.length === 1 ? "materia" : "materie"}
-          </h2>
+          <h2>{titolo}</h2>
         </div>
         <div className="flex">
-          <button
+          {/*<button
             className="btn btn-small btn-primary"
             onClick={() => handleOpenAddVoto()}
           >
             + Aggiungi voto
-          </button>
+          </button>*/}
           <button
             className="btn btn-primary"
             onClick={() => setShowAddMateria(true)}
@@ -331,6 +350,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
             onVotiAggiornati={handleVotiAggiornati}
             onEliminaMateria={handleEliminaMateria}
             handleRinominaMateria={handleRinominaMateria}
+            onVotoModificato={onVotiModificati} // Passa la prop
           />
         ))}
       </div>
@@ -344,6 +364,7 @@ export function MaterieList({ user, apiUrl, onUpdateStats, periodo, anno }) {
           onClose={() => setShowAddVoto(false)}
           periodo={periodo}
           anno={anno}
+          onVotoModificato={onVotiModificati} // Passa la prop
         />
       )}
 

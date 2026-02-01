@@ -84,10 +84,6 @@
   .navbar{
     background-color: var(--system-background) !important;
   }
-
-  .materia-bg{
-    opacity: .05 !important;
-  }
 }
 
 * {
@@ -263,12 +259,7 @@ p {
   animation: spin 0.8s linear infinite;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  html {
-    font-size: 14px;
-  }
-  
+@media (max-width: 1200px) {
   .container {
     padding: 0 var(--spacing-sm);
   }
@@ -285,4 +276,22 @@ p {
 .fas.fa-trash:hover{
   translate: 0 -1px;
   cursor: pointer;
+}
+
+.space-between{
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+
+  .space-between{
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+  }
 }

@@ -1,7 +1,7 @@
 {
   "name": "schoolsync",
   "private": true,
-  "version": "3.0.3b",
+  "version": "3.0.4b",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,7 +1,7 @@
 /* materia.css */
 
 .materia-card {
-  background: transparent;
+  background: var(--secondary-background);
   border-radius: var(--radius-md);
   border: 1px solid var(--tertiary-background);
   overflow: hidden;
@@ -9,51 +9,10 @@
   position: relative;
 }
 
-.materia-bg {
-  z-index: -1;
-  background: linear-gradient(
-    135deg,
-    var(--accent-green),
-    var(--accent-green),
-    var(--accent-blue-secondary)
-  );
-  opacity: 0.1;
-  filter: blur(9px);
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius-md) !important;
-}
-
-.media-insufficiente .materia-bg {
-  background: linear-gradient(
-    135deg,
-    var(--accent-red),
-    var(--accent-red),
-    var(--accent-orange-secondary)
-  ) !important;
-}
-
-.media-mid .materia-bg {
-  background: linear-gradient(
-    135deg,
-    var(--accent-orange),
-    var(--accent-orange),
-    var(--accent-orange-secondary)
-  ) !important;
-}
-
-.media-nulla .materia-bg {
-  background: linear-gradient(
-    135deg,
-    var(--accent-blue),
-    var(--accent-blue),
-    var(--accent-blue-secondary)
-  ) !important;
-}
-
 .materia-card:hover {
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .materia-card.expanded {
@@ -199,7 +158,9 @@
 }
 
 .voti-section {
-  margin-bottom: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  margin-inline: var(--spacing-sm);
 }
 
 .section-title {
@@ -227,12 +188,19 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  max-height: 300px;
+  height: 300px;
   overflow-y: auto;
 
   /* Scrollbar minimal/nascosta */
   scrollbar-width: none; /* Firefox - scrollbar sottile */
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox - colore minimal */
+}
+
+@media (max-width: 768px){
+  .voti-list{
+    height: inherit;
+    max-height: 300px;
+  }
 }
 
 /* Webkit (Chrome, Safari, Edge) */
@@ -254,61 +222,28 @@
 }
 
 .voto-element {
+  background: transparent;
+  border-radius: var(--radius-md);
   position: relative;
   width: 100%;
   margin: 0;
 }
 
+.materia-bg{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.05;
+  border-radius: var(--radius-md);
+  z-index: -1;
+  background: var(--label-primary);
+}
+
 .btns {
   margin-inline: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-}
-
-.voto-element .materia-bg {
-  height: 90%;
-  width: 95%;
-  top: 5%;
-  left: 2.5%;
-  z-index: -1 !important;
-  opacity: 0.15;
-  filter: blur(0);
-  background: linear-gradient(
-    135deg,
-    var(--accent-green),
-    var(--accent-green),
-    var(--accent-green-secondary)
-  ) !important;
-}
-
-.voto-element.voto-insufficiente .materia-bg {
-  color: var(--accent-red) !important;
-  background: var(--accent-red-secondary);
-  background: linear-gradient(
-    135deg,
-    var(--accent-red),
-    var(--accent-red),
-    var(--accent-orange-secondary)
-  ) !important;
-}
-
-.voto-element.voto-mid .materia-bg {
-  background: var(--accent-orange-secondary);
-  background: linear-gradient(
-    135deg,
-    var(--accent-orange),
-    var(--accent-orange),
-    var(--accent-orange-secondary)
-  ) !important;
-}
-
-.voto-element.voto-nullo .materia-bg {
-  background: var(--accent-blue-secondary);
-  background: linear-gradient(
-    135deg,
-    var(--accent-blue),
-    var(--accent-blue),
-    var(--accent-blue-secondary)
-  ) !important;
 }
 
 .voto-element.voto-sufficiente {
@@ -331,17 +266,10 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-xl);
-  padding-block: var(--spacing-md);
+  padding: var(--spacing-md);
   background: transparent;
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
-}
-
-@media (max-width: 768px) {
-  .voto-item {
-    padding: var(--spacing-md) !important;
-  }
 }
 
 .voto-value {
@@ -353,11 +281,11 @@
   padding: 6px 12px;
   border-radius: var(--radius-full);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem;
   aspect-ratio: 1 / 1;
   box-sizing: border-box;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -397,6 +325,8 @@
   gap: var(--spacing-xs);
   font-weight: 600;
   margin-bottom: 4px;
+  left: var(--spacing-md);
+  bottom: var(--spacing-md);
 }
 
 .voto-insufficiente .voto-tipo {
@@ -408,13 +338,13 @@
 }
 
 .tipo-icon {
-  font-size: 0.875rem;
+  font-size: 1.5rem;
 }
 
 .voto-meta {
   display: flex;
   gap: var(--spacing-md);
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: var(--label-secondary);
 }
 
@@ -453,9 +383,15 @@
 
 .voto-periodo,
 .anno-voto {
-  font-size: 0.75rem;
+  font-size: 1rem;
   background: transparent;
   border-radius: var(--radius-md);
+}
+
+.voto-scritte{
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .voto-meta {
@@ -549,9 +485,28 @@
   width: 100%;
 }
 
+/* Bottone elimina */
 .delete-btn {
-  background: transparent;
-  border: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--secondary-background);
+  border-radius: var(--radius-full);
+  color: var(--accent-red);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.delete-btn:hover {
+  background: var(--accent-red);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .delete-btn i {
@@ -561,6 +516,14 @@
 .delete-btn-text {
   background-color: var(--accent-red) !important;
   margin: auto;
+}
+
+.delete-btn-text:hover {
+  background-color: var(--accent-red-secondary) !important;
+}
+
+.delete-btn-text i {
+  color: #fff !important;
 }
 
 @media (max-width: 768px) {
@@ -578,5 +541,37 @@
 
   .voto-value {
     margin: 0;
+  }
+}
+
+.expand-btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+@media (min-width: 769px) {
+  .materia-header{
+    position: relative;
+  }
+
+  .materia-stats{
+    position: absolute;
+    right: var(--spacing-lg);
+    top: calc(var(--spacing-lg) * 2);
+    transform: translateY(-50%);
+  }
+
+  .materia-info{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .expand-btn{
+    position: absolute;
+    right: var(--spacing-lg);
+    bottom: var(--spacing-lg);
   }
 }

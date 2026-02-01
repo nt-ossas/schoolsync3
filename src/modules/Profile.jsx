@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
+import { useMemo } from "react";
+import { useState } from "react";
 import "./profile.css";
 
-export function Profile({ user, onUserUpdated }) {
+export function Profile({ user, onUserUpdated, onLogout, caricaTema }) {
   const initialForm = useMemo(
     () => ({
       id: user?.id ?? "",
@@ -11,7 +13,7 @@ export function Profile({ user, onUserUpdated }) {
       classe: user?.classe ?? "",
       password: "",
     }),
-    [user]
+    [user],
   );
 
   const [form, setForm] = useState(initialForm);
@@ -64,7 +66,9 @@ export function Profile({ user, onUserUpdated }) {
       if (!res.ok || data.success === false) {
         const msg =
           data?.error ||
-          (Array.isArray(data?.errors) ? data.errors.join(", ") : "Errore aggiornamento");
+          (Array.isArray(data?.errors)
+            ? data.errors.join(", ")
+            : "Errore aggiornamento");
         throw new Error(msg);
       }
 
@@ -88,8 +92,8 @@ export function Profile({ user, onUserUpdated }) {
   return (
     <div className="profile">
       <div className="info-user">
-        <div className="info-card">
-          <h2>Profilo</h2>
+        <h2>Profilo</h2>
+        <div className="stat-card">
 
           <form onSubmit={handleSubmit}>
             <div className="profile-form">
@@ -100,7 +104,12 @@ export function Profile({ user, onUserUpdated }) {
 
               <label>
                 Username
-                <input name="username" value={form.username} onChange={handleChange} readOnly={ro} />
+                <input
+                  name="username"
+                  value={form.username}
+                  onChange={handleChange}
+                  readOnly={ro}
+                />
               </label>
 
               <label>
@@ -116,12 +125,22 @@ export function Profile({ user, onUserUpdated }) {
 
               <label>
                 Scuola
-                <input name="scuola" value={form.scuola} onChange={handleChange} readOnly={ro} />
+                <input
+                  name="scuola"
+                  value={form.scuola}
+                  onChange={handleChange}
+                  readOnly={ro}
+                />
               </label>
 
               <label>
                 Classe
-                <input name="classe" value={form.classe} onChange={handleChange} readOnly={ro} />
+                <input
+                  name="classe"
+                  value={form.classe}
+                  onChange={handleChange}
+                  readOnly={ro}
+                />
               </label>
 
               <label>
@@ -132,7 +151,9 @@ export function Profile({ user, onUserUpdated }) {
                   value={form.password}
                   onChange={handleChange}
                   readOnly={ro}
-                  placeholder={isEditing ? "Lascia vuoto per non cambiarla" : "••••••••"}
+                  placeholder={
+                    isEditing ? "Lascia vuoto per non cambiarla" : "••••••••"
+                  }
                 />
               </label>
             </div>
@@ -142,9 +163,19 @@ export function Profile({ user, onUserUpdated }) {
 
             <div className="btns">
               {!isEditing ? (
-                <button type="button" onClick={startEdit}>
-                  Modifica
-                </button>
+                <>
+                  <button type="button" onClick={startEdit}>
+                    Modifica
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="btn btn-secondary logout-btn"
+                  >
+                    <i className="fas fa-arrow-right-from-bracket"></i>
+                    Esci
+                  </button>
+                </>
               ) : (
                 <>
                   <button type="button" onClick={cancelEdit} disabled={loading}>
@@ -157,6 +188,23 @@ export function Profile({ user, onUserUpdated }) {
               )}
             </div>
           </form>
+
+          <div className="theme-toggle">
+              <button
+                onClick={() => {
+                  if (localStorage.getItem("theme") !== "dark") {
+                    localStorage.removeItem("theme");
+                    localStorage.setItem("theme", "dark");
+                  } else {
+                    localStorage.removeItem("theme");
+                    localStorage.setItem("theme", "light");
+                  }
+                  caricaTema();
+                }}
+              >
+              Tema Scuro
+              </button>
+          </div>
         </div>
       </div>
     </div>

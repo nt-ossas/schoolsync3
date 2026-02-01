@@ -9,9 +9,12 @@ export function AggiungiVoto({
   onClose,
   periodo,
   anno,
+  onVotoModificato,
 }) {
   const [loading, setLoading] = useState(false);
   const [materie, setMaterie] = useState([]);
+  
+  // Inizializza il form con materiaId se fornito
   const [formData, setFormData] = useState({
     materia_id: materiaId || "",
     voto: "",
@@ -27,6 +30,16 @@ export function AggiungiVoto({
     caricaMaterie();
   }, [user, anno]);
 
+  // Aggiorna materia_id quando cambia materiaId
+  useEffect(() => {
+    if (materiaId) {
+      setFormData(prev => ({
+        ...prev,
+        materia_id: materiaId
+      }));
+    }
+  }, [materiaId]);
+
   async function caricaMaterie() {
     try {
       const response = await fetch(
@@ -37,10 +50,25 @@ export function AggiungiVoto({
         let materieFiltrate = data.materie || [];
 
         if (anno !== undefined && anno !== null) {
-          materieFiltrate = materieFiltrate.filter((m) => m.anno === anno);
+          materieFiltrate = materieFiltrate.filter((m) => m.anno == anno);
         }
 
         setMaterie(materieFiltrate);
+        
+        // Se non c'è una materia selezionata ma abbiamo materiaId, usala
+        if (!formData.materia_id && materiaId) {
+          setFormData(prev => ({
+            ...prev,
+            materia_id: materiaId
+          }));
+        }
+        // Altrimenti seleziona la prima materia disponibile
+        else if (!formData.materia_id && materieFiltrate.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            materia_id: materieFiltrate[0].id
+          }));
+        }
       }
     } catch (err) {
       console.error("Errore caricamento materie:", err);
@@ -94,6 +122,10 @@ export function AggiungiVoto({
       if (data.success) {
         if (onVotoAggiunto) {
           onVotoAggiunto();
+        }
+        // Notifica che un voto è stato aggiunto
+        if (onVotoModificato) {
+          onVotoModificato();
         }
         if (onClose) {
           onClose();
@@ -154,7 +186,6 @@ export function AggiungiVoto({
         </div>
 
         <form onSubmit={handleSubmit} className="voto-form">
-          {}
           <div className="form-group">
             <label htmlFor="materia_id">
               Materia <span className="required">*</span>
@@ -165,7 +196,7 @@ export function AggiungiVoto({
               value={formData.materia_id}
               onChange={handleChange}
               required
-              disabled={loading || !!materiaId}
+              disabled={loading}
             >
               <option value="">Seleziona una materia</option>
               {materie.map((materia) => (
@@ -176,7 +207,6 @@ export function AggiungiVoto({
             </select>
           </div>
 
-          {}
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="voto">
@@ -193,7 +223,7 @@ export function AggiungiVoto({
                 <option value="">Seleziona voto</option>
                 {voti_options()}
               </select>
-              <span className="helper-text">Da 1 a 10</span>
+              <span className="helper-text">Da 2 a 10</span>
             </div>
 
             <div className="form-group">
@@ -208,16 +238,15 @@ export function AggiungiVoto({
                 onChange={handleChange}
                 placeholder="100"
                 min="0"
-                max="100"
-                step="1"
+                max="200"
+                step="10"
                 required
                 disabled={loading}
               />
-              <span className="helper-text">0-100%</span>
+              <span className="helper-text">0-200% (0% = non influisce)</span>
             </div>
           </div>
 
-          {}
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="tipo">
@@ -231,12 +260,9 @@ export function AggiungiVoto({
                 required
                 disabled={loading}
               >
-                <option value="Scritto">Scritto
-                </option>
-                <option value="Orale">Orale
-                </option>
-                <option value="Pratico">Pratico
-                </option>
+                <option value="Scritto">Scritto</option>
+                <option value="Orale">Orale</option>
+                <option value="Pratico">Pratico</option>
               </select>
             </div>
 
@@ -256,7 +282,6 @@ export function AggiungiVoto({
             </div>
           </div>
 
-          {}
           <div className="form-group">
             <label htmlFor="periodo">
               Periodo <span className="required">*</span>
@@ -274,7 +299,6 @@ export function AggiungiVoto({
             </select>
           </div>
 
-          {}
           <div className="form-group">
             <label htmlFor="descrizione">Descrizione</label>
             <input
@@ -290,7 +314,6 @@ export function AggiungiVoto({
             <span className="helper-text">Opzionale, max 100 caratteri</span>
           </div>
 
-          {}
           <div className="form-actions">
             <button
               type="button"

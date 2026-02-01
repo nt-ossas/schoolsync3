@@ -12,10 +12,16 @@
 .navbar-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding-block: var(--spacing-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+@media (max-width: 768px){
+  .navbar-container{
+    padding-inline: var(--spacing-md);
+  }
 }
 
 .navbar-brand {
@@ -40,9 +46,40 @@
 
 .navbar-menu {
   display: flex;
+  justify-content: center;
+  flex-direction: column;
   align-items: center;
   gap: var(--spacing-md);
+  position: relative;
 }
+
+.navbar-menu select.stat-value {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 10px;
+  width: 100px;
+  position: absolute;
+  top: var(--spacing-md);
+  right: 30px;
+}
+
+.navbar-menu select.stat-value:hover {
+  border-color: none;
+}
+
+.navbar-menu select.stat-value:focus {
+  outline: none;
+  border-color: currentColor;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
 
 .navbar-profile {
   display: flex;
@@ -53,14 +90,6 @@
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all var(--transition-fast);
-}
-
-.navbar-profile:hover {
-  translate: 0 -1px;
-}
-
-.navbar-profile:hover .profile-name{
-  text-decoration: underline;
 }
 
 .profile-avatar {
@@ -92,6 +121,10 @@
   font-weight: 500;
   color: var(--label-primary);
   text-transform: capitalize;
+  position: absolute;
+  bottom: calc(var(--spacing-sm) + 2px);
+  z-index: 2;
+  right: 45px;
 }
 
 .logout-btn {

@@ -8,12 +8,13 @@ export function Materia({
   periodo,
   onVotiAggiornati,
   onEliminaMateria,
-  handleRinominaMateria
+  handleRinominaMateria,
+  onVotoModificato,
+  onAddVoto, // Nuova prop per aprire il modal di aggiunta voto
 }) {
   const [expanded, setExpanded] = useState(false);
   const [voti, setVoti] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState(null);
   const [error, setError] = useState(null);
   const [showRinomina, setShowRinomina] = useState(false);
 
@@ -50,6 +51,10 @@ export function Materia({
 
       if (data.success) {
         caricaVoti();
+        // Notifica che un voto è stato modificato
+        if (onVotoModificato) {
+          onVotoModificato();
+        }
       } else {
         alert(`Errore: ${data.error || "Errore sconosciuto"}`);
       }
@@ -81,7 +86,6 @@ export function Materia({
 
       const votiCaricati = data.voti || [];
       setVoti(votiCaricati);
-      setStats(data.stats || null);
 
       if (onVotiAggiornati) {
         onVotiAggiornati(materia.id, votiCaricati);
@@ -132,7 +136,11 @@ export function Materia({
     const media = parseFloat(mediaString);
     if (isNaN(media)) return "media-nulla";
 
-    return media < 5 ? "media-insufficiente" : media < 6 ? "media-mid" : "media-sufficiente";
+    return media < 5
+      ? "media-insufficiente"
+      : media < 6
+        ? "media-mid"
+        : "media-sufficiente";
   };
 
   const calcolaVotiPeriodo = () => {
@@ -175,16 +183,21 @@ export function Materia({
       <div
         className={`materia-card ${expanded ? "expanded" : ""} ${getMediaClass()}`}
       >
-        <div className="materia-bg"></div>
         <div className="materia-header" onClick={() => setExpanded(!expanded)}>
           <div className="materia-info">
             <div className="materia-icon">
               {materia.nome.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h3 className="materia-nome">{materia.nome}</h3>
+              <h3 className="materia-nome">
+                {materia.nome.length > 11
+                  ? materia.nome.slice(0, 11) + "..."
+                  : materia.nome}
+              </h3>
               <p className="materia-codice">
-                <span id="materia-anno">A.S. {anni[materia.anno]} • </span>{calcolaVotiPeriodo()} Vot{calcolaVotiPeriodo() === 1 ? "o" : "i"}
+                <span id="materia-anno">A.S. {anni[materia.anno]} • </span>
+                {calcolaVotiPeriodo()} Vot
+                {calcolaVotiPeriodo() === 1 ? "o" : "i"}
               </p>
             </div>
           </div>
@@ -206,11 +219,17 @@ export function Materia({
                 setExpanded(!expanded);
               }}
             >
-              {expanded ? (
-                <i className="fas fa-minus"></i>
-              ) : (
-                <i className="fas fa-plus"></i>
-              )}
+              <i 
+                className="fas fa-plus"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Apri il modal per aggiungere voto, passando l'ID della materia corrente
+                  if (onAddVoto) {
+                    onAddVoto(materia.id);
+                  }
+                }}
+                title="Aggiungi voto"
+              ></i>
             </button>
           </div>
         </div>
@@ -235,7 +254,9 @@ export function Materia({
                 <div className="voti-section">
                   {calcolaVotiPeriodo() === 0 ? (
                     <div className="empty-state">
-                      <span className="empty-icon"><i class="fa-regular fa-folder-open"></i></span>
+                      <span className="empty-icon">
+                        <i className="fa-regular fa-folder-open"></i>
+                      </span>
                       <p>
                         nessun voto registrato{" "}
                         {periodo !== null ? `per questo periodo` : ""}
@@ -253,10 +274,15 @@ export function Materia({
                           })
                           .map((voto, index) => {
                             const votoClass =
-                              voto.voto >= 6 && voto.peso > 0 ? "voto-sufficiente" 
-                              : voto.voto >= 5 && voto.peso > 0 ? "voto-mid" 
-                              : voto.voto < 5 && voto.peso > 0 ? "voto-insufficiente"
-                              : voto.peso == 0 ? "voto-nullo" : "voto-nullo"
+                              voto.voto >= 6 && voto.peso > 0
+                                ? "voto-sufficiente"
+                                : voto.voto >= 5 && voto.peso > 0
+                                  ? "voto-mid"
+                                  : voto.voto < 5 && voto.peso > 0
+                                    ? "voto-insufficiente"
+                                    : voto.peso == 0
+                                      ? "voto-nullo"
+                                      : "voto-nullo";
 
                             return (
                               <div
@@ -267,34 +293,42 @@ export function Materia({
                                 <div className="voto-item">
                                   <div className="voto-value">
                                     <span
-                                      className={`voto-badge ${voto.voto >= 6 && voto.peso > 0 ? "sufficiente" : voto.voto >= 5 && voto.peso > 0 ? "mid" : voto.voto < 5 && voto.peso > 0 ? "insufficiente" : voto.peso == 0 ? "nullo" : "nullo"}`}
+                                      className={`voto-badge ${
+                                        voto.voto >= 6 && voto.peso > 0
+                                          ? "sufficiente"
+                                          : voto.voto >= 5 && voto.peso > 0
+                                            ? "mid"
+                                            : voto.voto < 5 && voto.peso > 0
+                                              ? "insufficiente"
+                                              : voto.peso == 0
+                                                ? "nullo"
+                                                : "nullo"
+                                      }`}
                                     >
                                       {formatta(voto.voto)}
                                     </span>
                                   </div>
 
-                                  <div className="voto-details">
-                                    <div className="voto-tipo">
-                                      <span className="tipo-icon">
-                                        {voto.tipo === "Scritto"
-                                          ? <i className="fa-solid fa-file-lines"></i>
-                                          : voto.tipo === "Orale"
-                                            ? <i className="fa-solid fa-volume-high"></i>
-                                            : <i className="fa-solid fa-wrench"></i>}
-                                      </span>
+                                  <div className="voto-scritte">
+                                    <div>
+                                      {voto.tipo === "Scritto" ? (
+                                        <i className="fa-solid fa-file-lines"></i>
+                                      ) : voto.tipo === "Orale" ? (
+                                        <i className="fa-solid fa-volume-high"></i>
+                                      ) : (
+                                        <i className="fa-solid fa-wrench"></i>
+                                      )}{" "}
                                       {voto.tipo}
                                     </div>
 
-                                    <div className="voto-meta">
-                                      <div>
+                                    <div className="voto-details">
+                                      <div className="voto-meta">
                                         <span className="voto-peso">
                                           {voto.peso}%
                                         </span>
                                         <span className="voto-data">
                                           {voto.data_formatted || voto.data}
                                         </span>
-                                      </div>
-                                      <div>
                                         <span className="voto-periodo">
                                           {voto.periodo === 0 ||
                                           voto.periodo === "0"
@@ -303,14 +337,14 @@ export function Materia({
                                           periodo
                                         </span>
                                       </div>
-                                    </div>
 
-                                    {voto.descrizione &&
-                                      voto.descrizione !== "Voto registrato" && (
-                                        <div className="voto-descrizione">
-                                          {voto.descrizione}
-                                        </div>
-                                      )}
+                                      {voto.descrizione &&
+                                        voto.descrizione !== "Voto registrato" && (
+                                          <div className="voto-descrizione">
+                                            {voto.descrizione}
+                                          </div>
+                                        )}
+                                    </div>
                                   </div>
                                   <button
                                     className="delete-btn"
@@ -328,6 +362,17 @@ export function Materia({
                 </div>
                 <div className="btns materia-btns">
                   <button
+                    className="btn btn-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowRinomina(true);
+                    }}
+                    title="Rinomina materia"
+                  >
+                    <i className="fas fa-pencil"></i> Rinomina
+                  </button>
+
+                  <button
                     className="delete-btn-text btn btn-primary"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -338,16 +383,6 @@ export function Materia({
                     title="Elimina materia"
                   >
                     <i className="fas fa-trash"></i> Elimina
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowRinomina(true);
-                    }}
-                    title="Rinomina materia"
-                  >
-                    <i className="fas fa-pencil"></i> Rinomina
                   </button>
                 </div>
               </>
@@ -362,19 +397,25 @@ export function Materia({
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Rinomina Materia</h2>
-              <button className="close-btn" onClick={() => setShowRinomina(false)}>
+              <button
+                className="close-btn"
+                onClick={() => setShowRinomina(false)}
+              >
                 <i className="fas fa-xmark"></i>
               </button>
             </div>
 
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const nuovoNome = e.target.nome.value;
-              if (nuovoNome && nuovoNome.trim()) {
-                handleRinominaMateria(materia.id, nuovoNome.trim());
-                setShowRinomina(false);
-              }
-            }} className="materia-form">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const nuovoNome = e.target.nome.value;
+                if (nuovoNome && nuovoNome.trim()) {
+                  handleRinominaMateria(materia.id, nuovoNome.trim());
+                  setShowRinomina(false);
+                }
+              }}
+              className="materia-form"
+            >
               <div className="form-group">
                 <label htmlFor="nome">
                   Nuovo Nome Materia <span className="required">*</span>
@@ -399,10 +440,7 @@ export function Materia({
                 >
                   Annulla
                 </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                >
+                <button type="submit" className="btn btn-primary">
                   Rinomina
                 </button>
               </div>

@@ -117,3 +117,19 @@
 .welcome-section {
   margin-bottom: var(--spacing-xl);
 }
+
+.flex-header{
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 768px){
+  .flex-header{
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.flex-header > div{
+  flex: 1 1 100%;
+}

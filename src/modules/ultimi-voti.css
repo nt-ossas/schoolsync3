@@ -1,0 +1,53 @@
+.ultimi-voti-container {
+  margin-bottom: var(--spacing-xl);
+}
+
+.ultimi-voti-container ul{
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+
+  /* Scrollbar minimal/nascosta */
+  scrollbar-width: none; /* Firefox - scrollbar sottile */
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox - colore minimal */
+}
+
+@media (max-width: 768px) {
+  .ultimi-voti-container ul{
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}
+
+/* Webkit (Chrome, Safari, Edge) */
+.ultimi-voti-container ul::-webkit-scrollbar {
+  width: 6px; /* Larghezza ridotta */
+}
+
+.ultimi-voti-container ul::-webkit-scrollbar-track {
+  background: transparent; /* Traccia invisibile */
+}
+
+.ultimi-voti-container ul::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2); /* Thumb semi-trasparente */
+  border-radius: 3px;
+}
+
+.ultimi-voti-container ul::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3); /* Leggermente più visibile on hover */
+}
+
+.ultimi-voti{
+  font-size: 1.65rem;
+  padding: var(--spacing-lg);
+}
+
+.voti-count {
+  font-size: 0.95rem;
+  color: var(--label-secondary);
+  margin-bottom: var(--spacing-sm);
+  padding: 0;
+}

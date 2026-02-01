@@ -13,14 +13,21 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
     setLoading(true);
 
     try {
+      const isEmail = email.includes("@");
+      const identifier = email.trim();
+
+      if (!identifier || !password) {
+        throw new Error("Inserisci email/username e password");
+      }
+
       const response = await fetch(`${apiUrl}/login.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email,
-          password,
+          [isEmail ? "email" : "username"]: identifier,
+          password: password,
         }),
       });
 
@@ -34,20 +41,14 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
 
       console.log("User data from API:", data.user);
 
-      onLogin(data.user);
+      if (data.user) {
+        onLogin(data.user);
+      } else {
+        throw new Error("Dati utente non validi");
+      }
     } catch (err) {
       console.error("Login error:", err);
       setError(err.message || "Impossibile connettersi al server");
-
-      let prova = {
-        id: 2,
-        username: "UtenteDiProva",
-        email: "prova@gmail.com",
-        classe: "4M",
-        school: "b",
-      };
-      onLogin(prova);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -66,14 +67,15 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label">Email o Username</label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input"
               required
               disabled={loading}
+              placeholder="Inserisci email o username"
             />
           </div>
 
@@ -86,6 +88,7 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
               className="input"
               required
               disabled={loading}
+              placeholder="Inserisci la password"
             />
           </div>
 
@@ -115,7 +118,12 @@ export function Login({ onLogin, apiUrl, switchToSignUp }) {
         <div className="login-footer">
           <p>
             Non hai un account?
-            <button className="link-btn" onClick={switchToSignUp}>
+            <button
+              type="button"
+              className="link-btn"
+              onClick={switchToSignUp}
+              disabled={loading}
+            >
               Registrati
             </button>
           </p>

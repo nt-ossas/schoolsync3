@@ -56,3 +56,7 @@
   font-size: 0.875rem;
   text-align: center;
 }
+
+a{
+  color: var(--label-secondary);
+}
