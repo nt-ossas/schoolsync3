@@ -20,6 +20,10 @@ export function TesterPanel({ apiUrl, userRole }) {
       if (!data.success) {
         throw new Error(data.error || "Errore nel caricamento delle segnalazioni")
       }
+      Array.isArray(data.richieste) && data.richieste.forEach(req => {
+        req.autorizzato = req.autorizzato ? "Autorizzato" : "Non autorizzato"
+        req.completato = req.completato ? "Completato" : "Non completato"
+      })
       setRequests(Array.isArray(data.richieste) ? data.richieste : [])
     } catch (err) {
       setError(err.message || "Errore nel caricamento delle segnalazioni")
@@ -64,29 +68,21 @@ export function TesterPanel({ apiUrl, userRole }) {
       { key: "autore", title: "Autore" },
       { key: "testo", title: "Segnalazione" },
       { key: "data", title: "Data" },
+      { key: "autorizzato", title: "Autorizzazione" },
       {
         key: "actions",
         title: "Action",
         render: (row) =>
-          isAdmin ? (
+          isAdmin && (
             <Button
               size="sm"
               variant="secondary"
               loading={actionId === row.id}
-              onClick={() => handleDeleteRequest(row.id)}
+              onClick={() => alert("Modifica richiesta")} //modifica
             >
-              Completa
+              Modifica
             </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="secondary"
-              loading={actionId === row.id}
-              onClick={() => alert("Non hai i permessi necessari")}
-            >
-              Completa
-            </Button>
-          ),
+          )
       },
     ],
     [actionId, handleDeleteRequest, isAdmin],

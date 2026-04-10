@@ -36,7 +36,6 @@ export function Assistenza({ user, apiUrl }) {
         data: new Date().toISOString(),
       };
 
-      // Prima invio al database
       try {
         const dbResponse = await fetch(
           "https://schoolsync.altervista.org/bot/aggiungi_msg.php",
@@ -62,7 +61,6 @@ export function Assistenza({ user, apiUrl }) {
         console.warn("Errore connessione DB:", dbError.message);
       }
 
-      // Poi invio al bot di assistenza
       const botResponse = await fetch(
         "https://notify-sc.onrender.com/webhook/assistenza",
         {
@@ -91,15 +89,12 @@ export function Assistenza({ user, apiUrl }) {
         throw new Error(botData.error || "Errore dal server bot");
       }
 
-      // Successo
       setAssistenzaSuccess("Richiesta inviata! Ti aiuterò al più presto.");
 
-      // Reset del form
       if (problemaInput) {
         problemaInput.value = "";
       }
 
-      // Rimuove il messaggio di successo dopo 5 secondi
       setTimeout(() => {
         setAssistenzaSuccess("");
       }, 5000);
@@ -120,7 +115,6 @@ export function Assistenza({ user, apiUrl }) {
 
       setAssistenzaError(errorMessage);
 
-      // Rimuove il messaggio di errore dopo 5 secondi
       setTimeout(() => {
         setAssistenzaError("");
       }, 5000);
@@ -140,13 +134,15 @@ export function Assistenza({ user, apiUrl }) {
             <span className="section-badge short-text">Supporto rapido</span>
           </div>
           <p className="assistenza-description">
-            Hai riscontrato un problema o hai un idea per una nuova funzionalità? <br />Scrivi qua sotto e riceverai aiuto al
-            più presto.
+            Hai riscontrato un problema o hai un idea per una nuova
+            funzionalità? <br />
+            Scrivi qua sotto e riceverai aiuto al più presto.
           </p>
           <form onSubmit={handleSubmitAssistenza}>
             <div className="assistenza-form">
               <label htmlFor="problema">
-                <i className="fas fa-exclamation-circle"></i> Descrizione della segnalazione
+                <i className="fas fa-exclamation-circle"></i> Descrizione della
+                segnalazione
               </label>
               <textarea
                 id="problema"
@@ -183,7 +179,9 @@ export function Assistenza({ user, apiUrl }) {
                 <p className="error assistenza-error">{assistenzaError}</p>
               )}
               {assistenzaSuccess && (
-                <p className="success assistenza-success">{assistenzaSuccess}</p>
+                <p className="success assistenza-success">
+                  {assistenzaSuccess}
+                </p>
               )}
 
               <div className="assistenza-btns">
@@ -196,7 +194,8 @@ export function Assistenza({ user, apiUrl }) {
                 >
                   {loadingAssistenza ? (
                     <>
-                      <i className="fas fa-spinner fa-spin"></i> Invio in corso...
+                      <i className="fas fa-spinner fa-spin"></i> Invio in
+                      corso...
                     </>
                   ) : (
                     <>

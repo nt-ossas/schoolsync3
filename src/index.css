@@ -287,6 +287,7 @@ textarea {
   position: relative;
   pointer-events: none;
   user-select: none;
+  z-index: 9999999999;
 }
 
 .blurred * div{
@@ -303,6 +304,7 @@ textarea {
   border-radius: var(--radius-md);
   background: rgba(15, 18, 24, 0.4);
   cursor: default;
+  z-index: 9999999999;
 }
 
 .blurred::after {
@@ -316,6 +318,7 @@ textarea {
   font-size: 16px;
   font-weight: 500;
   pointer-events: auto;
+  z-index: 9999999999;
 }
 
 @media (max-width: 640px) {

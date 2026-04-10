@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from "react"
 import "./versions.css"
-import { Button, Modal, Input, Alert, Table, Card } from "../components/ui"
+import { Button, Modal, Input, Alert, Table, Card, Queue, Spinner } from "../components/ui"
 
 const API_BASE_URL = "/api"
 
@@ -13,6 +13,8 @@ export function Versions({ user }) {
   const [submitting, setSubmitting] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [loadingQueue, setLoadingQueue] = useState(false)
+  const [todos, setTodos] = useState([])
 
   async function fetchVersions() {
     try {
@@ -130,8 +132,29 @@ export function Versions({ user }) {
     }
   }
 
+  const loadTodos = async () => {
+    setLoadingQueue(true)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/carica_richieste.php`, { credentials: "include" })
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+
+      const data = JSON.parse(await response.text())
+      if (!data.success || !Array.isArray(data.richieste)) {
+        throw new Error(data.error || "Errore nel caricamento dello status")
+      }
+      const filtered = data.richieste.filter(r => !r.completato && r.autorizzato)
+      setTodos(filtered)
+    }catch (e) {
+      console.error("Errore:", e)
+    } finally {
+      setLoadingQueue(false)
+    }
+  }
+
   useEffect(() => {
     fetchVersions()
+    loadTodos()
   }, [])
 
   const formatDate = (dateString) => {
@@ -185,6 +208,15 @@ export function Versions({ user }) {
 
   return (
     <div className="versions">
+      <div className={user?.role !== "admin" ? 'blurred' : ""}>
+        {
+          loadingQueue ? (
+            <Card className="versions-state"><Spinner /> Caricamento status...</Card>
+          ) : (
+            <Queue todos={todos.length > 0 ? todos.slice(0, Math.min(todos.length, 4)) : []} />
+          )
+        }
+      </div>
       <div className="versions-header">
         <h2>Versioni di SchoolSync</h2>
         {user?.role === "admin" && (

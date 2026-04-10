@@ -1,6 +1,6 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Accessi } from "./Accessi"
-import { Alert, Button, Input, Modal, Section, Select, Table } from "../components/ui"
+import { Alert, Button, Input, Modal, Scuole, Section, Select, Table } from "../components/ui"
 import { PFP_CHOICES } from "../constants/pfpChoices"
 import "./admin.css"
 
@@ -33,7 +33,7 @@ export function AdminPanel({ apiUrl }) {
   const loadGraph = useCallback(async (giorni = 9999999) => {
     try {
       const res = await fetch(`${apiUrl}/carica_accessi.php?giorni=${giorni}`, {
-        credentials: "include"
+        credentials: "include",
       })
       const data = await res.json()
       if (!data.success) throw new Error(data.error)
@@ -72,13 +72,13 @@ export function AdminPanel({ apiUrl }) {
     {
       key: "token_segnalazioni",
       title: "segnal.",
-      render: (row) => (row.token_segnalazioni ?? "-")
+      render: (row) => (row.token_segnalazioni ?? "-"),
     },
     { key: "token_groq", title: "Groq" },
     {
       key: "last_active",
       title: "Ultima attività",
-      render: (row) => (row.last_active ? row.last_active : "-")
+      render: (row) => (row.last_active ? row.last_active : "-"),
     },
     {
       key: "actions",
@@ -94,11 +94,13 @@ export function AdminPanel({ apiUrl }) {
   function handleEditUser(user) {
     setEditingUser(user)
     setUserForm({
+      id: user.id ?? "",
       username: user.username ?? "",
       email: user.email ?? "",
       provincia: user.provincia ?? "",
       classe: user.classe ?? "",
       school: user.school ?? "",
+      password: "",
       role: user.role ?? "user",
       pfp: user.pfp ?? "scimmia",
       token_groq: user.token_groq ?? 0,
@@ -121,6 +123,7 @@ export function AdminPanel({ apiUrl }) {
       provincia: userForm.provincia,
       classe: userForm.classe,
       school: userForm.school,
+      password: userForm.password,
       role: userForm.role,
       pfp: userForm.pfp,
       token_groq: Number(userForm.token_groq) || 0,
@@ -155,12 +158,33 @@ export function AdminPanel({ apiUrl }) {
     setUserForm({})
   }
 
+  function handleClasseAnnoChange(value) {
+    setUserForm((prev) => ({
+      ...prev,
+      classe: value + (prev.classe?.match(/[A-Z]+$/i)?.[0] || ""),
+    }))
+  }
+
+  function handleClasseSezioneChange(value) {
+    setUserForm((prev) => ({
+      ...prev,
+      classe: (prev.classe?.match(/^\d+/)?.[0] || "") + value,
+    }))
+  }
+
+  function formatUserId(id) {
+    const stringId = String(id ?? "")
+    return "0".repeat(Math.max(0, 12 - stringId.length)) + stringId
+  }
+
   return (
     <div className="admin-page">
       {error && (
         <Alert variant="error">
           {error}
-          <Button type="button" variant="ghost" onClick={() => setError("")}>Chiudi</Button>
+          <Button type="button" variant="ghost" onClick={() => setError("")}>
+            Chiudi
+          </Button>
         </Alert>
       )}
 
@@ -196,12 +220,77 @@ export function AdminPanel({ apiUrl }) {
           }
         >
           <form id="admin-user-form" className="admin-user-form" onSubmit={handleUserSubmit}>
-            <Input label="Username" name="username" value={userForm.username} onChange={(e) => setUserForm((prev) => ({ ...prev, username: e.target.value }))} />
-            <Input label="Email" name="email" type="email" value={userForm.email} onChange={(e) => setUserForm((prev) => ({ ...prev, email: e.target.value }))} />
-            <Input label="Provincia" name="provincia" value={userForm.provincia} onChange={(e) => setUserForm((prev) => ({ ...prev, provincia: e.target.value }))} />
-            <Input label="Classe" name="classe" value={userForm.classe} onChange={(e) => setUserForm((prev) => ({ ...prev, classe: e.target.value }))} />
-            <Input label="Scuola" name="school" value={userForm.school} onChange={(e) => setUserForm((prev) => ({ ...prev, school: e.target.value }))} />
-            <Select label="Ruolo" name="role" value={userForm.role} onChange={(e) => setUserForm((prev) => ({ ...prev, role: e.target.value }))}>
+            <Input label="ID" name="id" value={formatUserId(userForm.id)} disabled />
+            <Input
+              label="Username"
+              name="username"
+              value={userForm.username}
+              onChange={(e) => setUserForm((prev) => ({ ...prev, username: e.target.value }))}
+            />
+            <Input
+              label="Email"
+              name="email"
+              type="email"
+              value={userForm.email}
+              onChange={(e) => setUserForm((prev) => ({ ...prev, email: e.target.value }))}
+            />
+            <div className="ui-field">
+              <span className="ui-field__label">Provincia e Scuola</span>
+              <Scuole
+                initialProvincia={userForm.provincia}
+                initialScuola={userForm.school}
+                onProvinciaChange={(value) => setUserForm((prev) => ({ ...prev, provincia: value }))}
+                onScuolaChange={(value) => setUserForm((prev) => ({ ...prev, school: value }))}
+                disabled={savingUser}
+                className="ui-select"
+              />
+            </div>
+            <div className="ui-field">
+              <span className="ui-field__label">Classe</span>
+              <div className="classe-row">
+                <Select
+                  name="classe-anno"
+                  value={userForm.classe?.match(/^\d+/)?.[0] || ""}
+                  onChange={(e) => handleClasseAnnoChange(e.target.value)}
+                  disabled={savingUser}
+                >
+                  <option value="">Anno</option>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>
+                      {n}°
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  name="classe-sezione"
+                  value={userForm.classe?.match(/[A-Z]+$/i)?.[0]?.toUpperCase() || ""}
+                  onChange={(e) => handleClasseSezioneChange(e.target.value)}
+                  disabled={savingUser}
+                >
+                  <option value="">Sezione</option>
+                  {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((lettera) => (
+                    <option key={lettera} value={lettera}>
+                      {lettera}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+            <Input
+              label="Nuova password (opzionale)"
+              name="password"
+              type="password"
+              value={userForm.password}
+              onChange={(e) => setUserForm((prev) => ({ ...prev, password: e.target.value }))}
+              placeholder="Lascia vuoto per non cambiarla"
+              helperText="Minimo 6 caratteri"
+            />
+            <Select
+              label="Ruolo"
+              name="role"
+              value={userForm.role}
+              onChange={(e) => setUserForm((prev) => ({ ...prev, role: e.target.value }))}
+            >
               <option value="user">User</option>
               <option value="tester">Tester</option>
               <option value="admin">Admin</option>
@@ -238,7 +327,7 @@ export function AdminPanel({ apiUrl }) {
             <Input
               label="Ultima attività"
               name="last_active"
-              value={userForm.last_active.split(" ")[0]}
+              value={(userForm.last_active || "").split(" ")[0]}
               onChange={(e) => setUserForm((prev) => ({ ...prev, last_active: e.target.value }))}
               helperText="Formato libero (2024-06-12 14:20:00)"
             />
