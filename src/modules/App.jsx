@@ -728,7 +728,7 @@ export function App() {
 
                     <Route
                       path="/versioni"
-                      element={<Versions user={user} />}
+                      element={<Versions user={user} apiUrl={API_BASE_URL} />}
                     />
                     <Route path="*" element={<Navigate to="/404" replace />} />
                   </Routes>

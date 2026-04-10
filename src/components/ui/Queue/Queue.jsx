@@ -20,7 +20,7 @@ export function Queue({ todos = [] }) {
             <div className="item" key={index}>
               <div className={"icon " + (item.completato ? "active" : "")}></div>
               <div className="queue-item">
-                <span>{item?.testo.split("\n")[0]}</span>
+                <span>{item?.titolo}</span>
               </div>
             </div>
           ))}

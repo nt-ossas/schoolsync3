@@ -122,3 +122,25 @@
     font-size: 0.7rem;
   }
 }
+
+.info-msg{
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.fa-bug{
+  color: var(--color-warning);
+}
+
+.fa-cloud-arrow-up{
+  color: var(--primary);
+}
+
+.fa-square-check{
+  color: var(--color-success);
+}
+
+.fa-hourglass-half{
+  color: var(--border-subtle);
+}

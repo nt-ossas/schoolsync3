@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "../components/ui/Button/Button.jsx";
+import { Button, Spinner } from "../components/ui";
 import { GroqChat } from "./GroqChat.jsx";
 import "./profile.css";
 
@@ -194,8 +194,7 @@ export function Assistenza({ user, apiUrl }) {
                 >
                   {loadingAssistenza ? (
                     <>
-                      <i className="fas fa-spinner fa-spin"></i> Invio in
-                      corso...
+                      <Spinner />  Invio in corso...
                     </>
                   ) : (
                     <>
