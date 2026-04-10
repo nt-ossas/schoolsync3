@@ -1,127 +1,45 @@
-import "./stats.css";
+﻿import "./stats.css"
+import { StatCard } from "../components/ui"
 
-export function StatsGrid({ statsData, periodo, anno, onChangePeriodo, onChangeAnno }) {
-  const getInsuffText = (num) => {
-    return <span className="short">Insufficienz{num === 1 ? "a" : "e"}</span>;
-  };
-
-  const mediaNumber =
-    statsData.mediaGenerale === "N/D" || statsData.mediaGenerale == null
-      ? null
-      : Number(statsData.mediaGenerale);
-
-  const mediaColor =
-    mediaNumber === null
-      ? "var(--accent-blue)"
-      : mediaNumber >= 6
-        ? "var(--accent-green)"
-        : mediaNumber >= 5
-          ? "var(--accent-orange)"
-          : "var(--accent-red)";
-
-  const mediaBgClass =
-    mediaNumber === null ? "media-nulla" : mediaNumber >= 6 ? "media-sufficiente" : mediaNumber >= 5 ? "media-mid" : "media-insufficiente";
-
-  const insuffBgClass = statsData.materieInsuff >= 3 ? "media-insufficiente" : statsData.materieInsuff >= 1 ? "media-mid" : mediaNumber === null ? "media-nulla" : "media-sufficiente";
+export function StatsGrid({ statsData }) {
+  const mediaNumber = statsData.mediaGenerale === "N/D" || statsData.mediaGenerale == null ? null : Number(statsData.mediaGenerale)
 
   const stats = [
     {
-      title: "Media Generale",
+      label: "Media Generale",
       value: statsData.mediaGenerale || "N/D",
-      icon: <i className="fa-solid fa-user-graduate" />,
-      color: mediaColor,
-      bgClass: mediaBgClass,
-      type: "media",
-    },
-    /*{
-      title: "Anno Scolastico",
-      icon: <i className="fa fa-calendar" />,
-      color: "var(--label-primary)",
-      bgClass: "media-nulla",
-      type: "anno",
-    },*/
-    {
-      title: "work in progress",
-      value: "N/D",
-      icon: "",
-      color: "",
-      bgClass: "",
-      type: "",
+      icon: <i className="fa-solid fa-chart-line" />,
+      tone: mediaNumber === null ? "primary" : mediaNumber >= 6 ? "accent" : mediaNumber >= 5 ? "warning" : "danger",
+      meta: mediaNumber === null ? "Nessuna media disponibile" : mediaNumber >= 6 ? "Andamento positivo" : "Da monitorare",
     },
     {
-      title: "Periodo",
-      icon: periodo === 0 ? <i className="fas fa-hourglass-start" /> : <i className="fas fa-hourglass-end" />,
-      color: "var(--label-primary)",
-      bgClass: "media-nulla",
-      type: "periodo",
+      label: "Voti Totali",
+      value: statsData.votiTotali,
+      icon: <i className="fa-solid fa-list-check" />,
+      tone: "accent",
+      meta: "Valutazioni registrate",
     },
     {
-      title: "Materie Insufficienti",
-      value: <>{statsData.materieInsuff} {getInsuffText(statsData.materieInsuff)}</>,
-      icon: statsData.materieInsuff >= 1 ? <i className="fa-solid fa-triangle-exclamation"></i> : <i className="fa-solid fa-square-check"></i>,
-      color: statsData.materieInsuff >= 3 ? "var(--accent-red)" : statsData.materieInsuff >= 1 ? "var(--accent-orange)" : "var(--accent-green)",
-      bgClass: insuffBgClass,
-      type: "insufficienti",
+      label: "Materie Totali",
+      value: statsData.materieTotali,
+      icon: <i className="fa-solid fa-book-open" />,
+      tone: "primary",
+      meta: "Materie attive",
     },
-  ];
+    {
+      label: "Materie Insufficienti",
+      value: statsData.materieInsuff,
+      icon: statsData.materieInsuff > 0 ? <i className="fa-solid fa-triangle-exclamation" /> : <i className="fa-solid fa-circle-check" />,
+      tone: statsData.materieInsuff > 0 ? "danger" : "accent",
+      meta: statsData.materieInsuff > 0 ? "Bisogna studiare" : "Nessuna materia insufficiente",
+    },
+  ]
 
   return (
     <div className="stats-grid">
-      {stats.map((stat, index) => (
-        <div key={index} className="stat-card">
-          <div className="stat-header">
-            <div className="stat-icon" style={{ backgroundColor: `${stat.color}15` }}>
-              <span style={{ color: stat.color }}>{stat.icon}</span>
-            </div>
-
-            <div className="stat-info">
-              <h3 className="stat-title">{stat.title}</h3>
-
-              {stat.type === "anno" ? (
-                <select
-                  name="anno"
-                  id="anno"
-                  value={anno ?? ""}
-                  onChange={(event) => onChangeAnno(event.target.value ? Number(event.target.value) : null)}
-                  className="stat-value"
-                  style={{ color: stat.color }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <option value="-1">Tutti gli anni</option>
-                  <option value="0">2023-24</option>
-                  <option value="1">2024-25</option>
-                  <option value="2">2025-26</option>
-                  <option value="3">2026-27</option>
-                  <option value="4">2027-28</option>
-                  <option value="5">2028-29</option>
-                  <option value="6">2029-30</option>
-                </select>
-              ) : stat.type === "periodo" ? (
-                <select
-                  name="periodo"
-                  id="periodo"
-                  value={periodo === null ? "tutti" : periodo}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    onChangePeriodo(value === "tutti" ? null : Number(value));
-                  }}
-                  className="stat-value"
-                  style={{ color: stat.color }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <option value="tutti">Tutti</option>
-                  <option value="0">Primo</option>
-                  <option value="1">Secondo</option>
-                </select>
-              ) : (
-                <p className={"stat-value" + (stat.type === "media" ? " media" : "")} style={{ color: stat.color }}>
-                  {stat.value}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+      {stats.map((item, index) => (
+        <StatCard key={index} label={item.label} value={item.value} icon={item.icon} tone={item.tone} meta={item.meta} />
       ))}
     </div>
-  );
+  )
 }

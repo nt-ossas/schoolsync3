@@ -1,0 +1,24 @@
+{
+  "name": "SchoolSync",
+  "short_name": "SchoolSync",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0F1218",
+  "theme_color": "#0F1218",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/schoolsync2.9.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/schoolsync2.9.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

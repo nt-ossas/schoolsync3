@@ -1,134 +1,71 @@
-import { useState } from "react";
-import "./login.css";
+﻿import { useState } from "react"
+import { Link } from "react-router-dom"
+import "./login.css"
+import { Button, Card, Input, Alert } from "../components/ui"
 
-export function Login({ onLogin, apiUrl, switchToSignUp }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+export function Login({ onLogin, apiUrl }) {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+    e.preventDefault()
+    setError("")
+    setLoading(true)
 
     try {
-      const isEmail = email.includes("@");
-      const identifier = email.trim();
-
-      if (!identifier || !password) {
-        throw new Error("Inserisci email/username e password");
-      }
+      const isEmail = email.includes("@")
+      const identifier = email.trim()
+      if (!identifier || !password) throw new Error("Inserisci email/username e password")
 
       const response = await fetch(`${apiUrl}/login.php`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          [isEmail ? "email" : "username"]: identifier,
-          password: password,
-        }),
-      });
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [isEmail ? "email" : "username"]: identifier, password }),
+        credentials: "include",
+      })
 
-      const data = await response.json();
+      const data = await response.json()
+      if (!data.success) throw new Error(data.error || "Login fallito")
+      if (!data.user) throw new Error("Dati utente non validi")
 
-      console.log("Login API response:", data);
-
-      if (!data.success) {
-        throw new Error(data.error || "Login fallito");
-      }
-
-      console.log("User data from API:", data.user);
-
-      if (data.user) {
-        onLogin(data.user);
-      } else {
-        throw new Error("Dati utente non validi");
-      }
+      onLogin(data.user)
     } catch (err) {
-      console.error("Login error:", err);
-      setError(err.message || "Impossibile connettersi al server");
+      setError(err.message || "Impossibile connettersi al server")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <div className="login-logo">
-            <i className="fa-solid fa-graduation-cap"></i>
+    <div className="auth-shell">
+      <Card className="auth-card auth-card--wide">
+        <div className="auth-header">
+          <div className="auth-logo">
+            <i className="fa-solid fa-graduation-cap" />
           </div>
-          <h1 className="login-title">SchoolSync</h1>
-          <p className="login-subtitle">Accedi al tuo account</p>
+          <h1>Accedi</h1>
+          <p>Entra nel tuo workspace SchoolSync</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label className="form-label">Email o Username</label>
-            <input
-              type="text"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input"
-              required
-              disabled={loading}
-              placeholder="Inserisci email o username"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <Input type="text" value={email} onChange={(e) => setEmail(e.target.value)} label="Email o Username" required disabled={loading} placeholder="tocodrew" />
+          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} label="Password" required disabled={loading} placeholder="••••••••" />
 
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input"
-              required
-              disabled={loading}
-              placeholder="Inserisci la password"
-            />
-          </div>
+          {error ? <Alert variant="error">{error}</Alert> : null}
 
-          {error && (
-            <div className="error-message">
-              <i className="icon-error">⚠️</i>
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="btn btn-primary login-btn"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="spinner"></span>
-                Accesso in corso...
-              </>
-            ) : (
-              "Accedi"
-            )}
-          </button>
+          <Button type="submit" variant="primary" size="lg" loading={loading} className="auth-submit">
+            {loading ? "Accesso..." : "Accedi"}
+          </Button>
         </form>
 
-        <div className="login-footer">
+        <div className="auth-footer">
           <p>
-            Non hai un account?
-            <button
-              type="button"
-              className="link-btn"
-              onClick={switchToSignUp}
-              disabled={loading}
-            >
-              Registrati
-            </button>
+            Non hai un account? <Link to="/signup">Registrati</Link>
           </p>
         </div>
-      </div>
+      </Card>
     </div>
-  );
+  )
 }

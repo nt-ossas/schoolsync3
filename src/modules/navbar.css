@@ -1,149 +1,99 @@
-/* navbar.css */
-.navbar {
-  background: var(--system-background);
-  border-bottom: 1px solid var(--tertiary-background);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-block: var(--spacing-md);
-  display: flex;
-  justify-content: space-between;
+﻿.navbar-brand {
+  display: inline-flex;
   align-items: center;
-}
-
-@media (max-width: 768px){
-  .navbar-container{
-    padding-inline: var(--spacing-md);
-  }
-}
-
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  cursor: pointer;
+  gap: 12px;
 }
 
 .navbar-logo {
-  font-size: 1.5rem;
-}
-
-.navbar-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  background: var(--label-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.navbar-menu {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-md);
-  position: relative;
+  justify-content: center;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  color: var(--primary);
 }
 
-.navbar-menu select.stat-value {
-  width: 100%;
-  padding: 6px 8px;
+.navbar-brand__text {
+  display: grid;
+  line-height: 1.1;
+}
+
+.navbar-brand__text strong {
+  color: var(--text-main);
   font-size: 14px;
-  font-weight: 600;
-  border: none;
-  border-radius: var(--radius-md);
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 10px;
-  width: 100px;
-  position: absolute;
-  top: var(--spacing-md);
-  right: 30px;
 }
 
-.navbar-menu select.stat-value:hover {
-  border-color: none;
+.navbar-brand__text span {
+  color: var(--text-tertiary);
+  font-size: 12px;
 }
 
-.navbar-menu select.stat-value:focus {
-  outline: none;
-  border-color: currentColor;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+.navbar-context {
+  display: flex;
+  gap: 8px;
 }
 
+.navbar-select {
+  min-width: 168px;
+}
+
+.navbar-profile-link {
+  display: inline-flex;
+}
 
 .navbar-profile {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  background: none;
-  border: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all var(--transition-fast);
+  min-width: 0;
+  height: 40px;
 }
 
-.profile-avatar {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, var(--accent-green), var(--accent-green), var(--accent-blue-secondary));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.profile-avatar.insufficiente{
-  background: linear-gradient(135deg, var(--accent-red), var(--accent-red), var(--accent-red-secondary));
-}
-
-.profile-avatar.mid{
-  background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange), var(--accent-orange-secondary));
-}
-
-.profile-avatar.nullo{
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue), var(--accent-blue-secondary));
+.pfp-img{
+  width: 28px;
+  height: 28px;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-lg);
 }
 
 .profile-name {
-  font-weight: 500;
-  color: var(--label-primary);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   text-transform: capitalize;
-  position: absolute;
-  bottom: calc(var(--spacing-sm) + 2px);
-  z-index: 2;
-  right: 45px;
 }
 
-.logout-btn {
-  padding: var(--spacing-xs) var(--spacing-md);
-  transition: .3s;
+@media (max-width: 1024px) {
+  .navbar-context {
+    width: 100%;
+  }
+
+  .navbar-select {
+    min-width: 0;
+    flex: 1;
+  }
 }
 
-.logout-btn:hover{
-  background-color: var(--accent-red) !important;
-  color: var(--secondary-background);
-  transition: .3s;
-}
+@media (max-width: 640px) {
+  .navbar {
+    gap: 10px;
+  }
 
-.fa-arrow-right-from-bracket{
-  rotate: 180deg;
-}
-
-@media (max-width: 768px) {
-  .navbar-title{
+  .navbar-brand__text span {
     display: none;
+  }
+
+  .profile-name {
+    max-width: 90px;
+  }
+
+  .navbar-context {
+    width: 100%;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .navbar-select {
+    width: 100%;
   }
 }

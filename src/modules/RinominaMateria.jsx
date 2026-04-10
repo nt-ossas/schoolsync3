@@ -22,10 +22,10 @@ export function RinominaMateria({ user, apiUrl, materiaId, onClose, onMateriaRin
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user_id: user.id,
           id_materia: materiaId,
           nuovo_nome: nome.trim(),
         }),
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -70,7 +70,7 @@ export function RinominaMateria({ user, apiUrl, materiaId, onClose, onMateriaRin
               name="nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              placeholder="es. Matematica, Italiano, Storia..."
+              placeholder="Matematica, Italiano, Storia..."
               maxLength={50}
               required
               autoFocus

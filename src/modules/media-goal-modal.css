@@ -1,0 +1,8 @@
+.media-goal__grades{
+  display: flex;
+  gap: 14px;
+}
+
+.media-goal__grade-pill{
+  width: 50px;
+}

@@ -1,283 +1,289 @@
-import { useEffect, useState } from "react";
-import "./versions.css";
+﻿import { useEffect, useState } from "react"
+import "./versions.css"
+import { Button, Modal, Input, Alert, Table, Card } from "../components/ui"
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = "/api"
 
 export function Versions({ user }) {
-  const [versions, setVersions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    titolo: "",
-    descrizione: "",
-    data: ""
-  });
-  const [submitting, setSubmitting] = useState(false);
+  const [versions, setVersions] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [showModal, setShowModal] = useState(false)
+  const [formData, setFormData] = useState({ titolo: "", descrizione: "", data: new Date().toISOString().split("T")[0] })
+  const [submitting, setSubmitting] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingId, setEditingId] = useState(null)
 
   async function fetchVersions() {
     try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetch(`${API_BASE_URL}/carica_versioni.php`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const text = await response.text();
-      let data;
-      
-      try {
-        data = JSON.parse(text);
-      } catch (parseError) {
-        console.error("Invalid JSON response:", text);
-        throw new Error("Il server ha restituito una risposta non valida");
-      }
-      
-      console.log("Versions data:", data);
+      setLoading(true)
+      setError(null)
 
+      const response = await fetch(`${API_BASE_URL}/carica_versioni.php`, { credentials: "include" })
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+
+      const data = JSON.parse(await response.text())
       if (data.success && Array.isArray(data.versions)) {
-        setVersions(data.versions);
+        setVersions(data.versions)
+        setFormData({ titolo: data.versions[0].titolo, descrizione: "", data: new Date().toISOString().split("T")[0] })
       } else {
-        throw new Error(data.error || "Errore nel caricamento delle versioni");
+        throw new Error(data.error || "Errore nel caricamento delle versioni")
       }
     } catch (error) {
-      console.error("Error fetching versions:", error);
-      setError(error.message);
+      setError(error.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
+  async function handleEditVersion(versionId) {
+    const version = versions.find((v) => v.id === versionId)
+    if (!version) return alert("Versione non trovata")
+
+    setFormData({ titolo: version.titolo, descrizione: version.descrizione || "", data: version.data })
+    setEditingId(versionId)
+    setShowEditModal(true)
+  }
+
   async function handleDeleteVersion(versionId) {
-    if (!confirm("Sei sicuro di voler eliminare questa versione?")) {
-      return;
-    }
+    if (!confirm("Sei sicuro di voler eliminare questa versione?")) return
 
     try {
       const response = await fetch(`${API_BASE_URL}/elimina_versione.php`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ 
-          id: versionId,
-          userId: user.id,
-          isAdmin: user.admin === 1 ? 1 : 0
-        })
-      });
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: versionId }),
+        credentials: "include",
+      })
 
-      const data = await response.json();
-
+      const data = await response.json()
       if (data.success) {
-        setVersions(versions.filter(v => v.id !== versionId));
+        setVersions(versions.filter((v) => v.id !== versionId))
       } else {
-        alert(data.error || "Errore durante l'eliminazione");
+        alert(data.error || "Errore durante l'eliminazione")
       }
-    } catch (error) {
-      console.error("Error deleting version:", error);
-      alert("Errore durante l'eliminazione della versione");
+    } catch {
+      alert("Errore durante l'eliminazione della versione")
     }
   }
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    
-    if (!formData.titolo || !formData.data) {
-      alert("Titolo e data sono obbligatori");
-      return;
-    }
+    e.preventDefault()
+
+    if (!formData.titolo || !formData.data) return alert("Titolo e data sono obbligatori")
 
     try {
-      setSubmitting(true);
-      
+      setSubmitting(true)
+
       const response = await fetch(`${API_BASE_URL}/aggiungi_versione.php`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          ...formData,
-          userId: user.id,
-          isAdmin: user.admin === 1 ? 1 : 0
-        })
-      });
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData }),
+        credentials: "include",
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.success) {
-        setShowModal(false);
-        setFormData({ titolo: "", descrizione: "", data: "" });
-        fetchVersions();
+        setShowModal(false)
+        setFormData({ titolo: versions[0].titolo, descrizione: "", data: new Date().toISOString().split("T")[0] })
+        fetchVersions()
       } else {
-        alert(data.error || "Errore durante l'aggiunta");
+        alert(data.error || "Errore durante l'aggiunta")
       }
-    } catch (error) {
-      console.error("Error adding version:", error);
-      alert("Errore durante l'aggiunta della versione");
+    } catch {
+      alert("Errore durante l'aggiunta della versione")
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
+    }
+  }
+
+  async function handleEditSubmit(e) {
+    e.preventDefault()
+
+    if (!formData.titolo || !formData.data) return alert("Titolo e data sono obbligatori")
+
+    try {
+      setSubmitting(true)
+
+      const response = await fetch(`${API_BASE_URL}/modifica_versione.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, id: editingId }),
+        credentials: "include",
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setShowEditModal(false)
+        setEditingId(null)
+        setFormData({ titolo: versions[0].titolo, descrizione: "", data: new Date().toISOString().split("T")[0] })
+        fetchVersions()
+      } else {
+        alert(data.error || "Errore durante la modifica")
+      }
+    } catch {
+      alert("Errore durante la modifica della versione")
+    } finally {
+      setSubmitting(false)
     }
   }
 
   useEffect(() => {
-    fetchVersions();
-  }, []);
+    fetchVersions()
+  }, [])
 
   const formatDate = (dateString) => {
     try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('it-IT', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
+      const date = new Date(dateString)
+      return date.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" })
     } catch {
-      return dateString;
+      return dateString
     }
-  };
+  }
+
+  const columns = [
+    { key: "titolo", title: "Titolo" },
+    { key: "data", title: "Data", render: (row) => formatDate(row.data) },
+    { key: "descrizione", title: "Descrizione", render: (row) => row.descrizione || "Nessuna descrizione disponibile" },
+  ]
+
+  if (user?.role === "admin") {
+    columns.push({
+      key: "edit",
+      title: "",
+      render: (row) => (
+        <Button
+          className="version-edit-btn"
+          variant="ghost"
+          size="sm"
+          onClick={() => handleEditVersion(row.id)}
+          aria-label="Modifica versione"
+        >
+          <i className="fas fa-edit" />
+        </Button>
+      ),
+    })
+
+    columns.push({
+      key: "delete",
+      title: "",
+      render: (row) => (
+        <Button
+          className="version-delete-btn"
+          variant="ghost"
+          size="sm"
+          onClick={() => handleDeleteVersion(row.id)}
+          aria-label="Elimina versione"
+        >
+          <i className="fas fa-trash" />
+        </Button>
+      ),
+    })
+  }
 
   return (
     <div className="versions">
       <div className="versions-header">
         <h2>Versioni di SchoolSync</h2>
-        {user && user.admin === 1 && (
-          <button 
-            onClick={() => setShowModal(true)} 
-            className="btn btn-primary"
+        {user?.role === "admin" && (
+          <Button
+            onClick={() => {
+              setFormData({ titolo: versions[0].titolo, descrizione: "", data: new Date().toISOString().split("T")[0] })
+              setEditingId(null)
+              setShowModal(true)
+            }}
+            variant="primary"
+            leftIcon={<i className="fas fa-plus" />}
           >
-            <i className="fas fa-plus"></i>
             Aggiungi Versione
-          </button>
+          </Button>
         )}
       </div>
-      
+
       {loading ? (
-        <p>Caricamento versioni...</p>
+        <Card className="versions-state">Caricamento versioni...</Card>
       ) : error ? (
-        <div className="error-message">
-          <p>Errore nel caricamento delle versioni: {error}</p>
-          <button onClick={fetchVersions} className="retry-button">
+        <div className="versions-state">
+          <Alert variant="error">Errore nel caricamento delle versioni: {error}</Alert>
+          <Button onClick={fetchVersions} variant="secondary">
             Riprova
-          </button>
+          </Button>
         </div>
       ) : versions.length === 0 ? (
-        <p>Nessuna versione disponibile</p>
+        <Card className="versions-state">Nessuna versione disponibile</Card>
       ) : (
-        <div className="versions-list">
-          {versions.map((version) => (
-            <div key={version.id} className="version-item stat-card">
-              <div className="version-header-row">
-                <div>
-                  <h3>{version.titolo || `Versione ${version.id}`}</h3>
-                  <p className="version-date">
-                    <strong>Data di rilascio:</strong> {formatDate(version.data)}
-                  </p>
-                </div>
-                {user && user.admin === 1 && (
-                  <button
-                    onClick={() => handleDeleteVersion(version.id)}
-                    className="delete-version-btn"
-                    title="Elimina versione"
-                  >
-                    <i className="fas fa-trash"></i>
-                  </button>
-                )}
-              </div>
-              <p className="version-description">
-                {version.descrizione || "Nessuna descrizione disponibile"}
-              </p>
-            </div>
-          ))}
-        </div>
+        <Table columns={columns} data={versions} />
       )}
 
-      {/* Modal per aggiungere versione */}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Aggiungi Nuova Versione</h2>
-              <button 
-                className="close-btn" 
-                onClick={() => setShowModal(false)}
+      {showEditModal && (
+        <Modal
+          title="Modifica Versione"
+          onClose={() => {
+            setShowEditModal(false)
+            setEditingId(null)
+          }}
+          footer={
+            <>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  setShowEditModal(false)
+                  setEditingId(null)
+                }}
+                disabled={submitting}
               >
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="version-form">
-              <div className="form-group">
-                <label htmlFor="titolo">
-                  Titolo <span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="titolo"
-                  value={formData.titolo}
-                  onChange={(e) => setFormData({...formData, titolo: e.target.value})}
-                  placeholder="es. Versione 1.0.0"
-                  required
-                />
-              </div>
+                Annulla
+              </Button>
+              <Button type="submit" form="version-edit-form" variant="primary" loading={submitting}>
+                {submitting ? "Salvataggio..." : "Salva Modifiche"}
+              </Button>
+            </>
+          }
+        >
+          <form id="version-edit-form" onSubmit={handleEditSubmit} className="ui-form-stack">
+            <Input type="text" id="titolo" value={formData.titolo} onChange={(e) => setFormData({ ...formData, titolo: e.target.value })} label="Titolo" placeholder="Versione 1.0.0" required />
 
-              <div className="form-group">
-                <label htmlFor="data">
-                  Data di rilascio <span className="required">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="data"
-                  value={formData.data}
-                  onChange={(e) => setFormData({...formData, data: e.target.value})}
-                  required
-                />
-              </div>
+            <Input type="date" id="data" value={formData.data} onChange={(e) => setFormData({ ...formData, data: e.target.value })} label="Data di rilascio" required />
 
-              <div className="form-group">
-                <label htmlFor="descrizione">Descrizione</label>
-                <textarea
-                  id="descrizione"
-                  value={formData.descrizione}
-                  onChange={(e) => setFormData({...formData, descrizione: e.target.value})}
-                  placeholder="Descrivi le novità di questa versione..."
-                  rows="5"
-                />
-              </div>
+            <label className="ui-field" htmlFor="descrizione">
+              <span className="ui-field__label">Descrizione</span>
+              <textarea className="ui-textarea" id="descrizione" value={formData.descrizione} onChange={(e) => setFormData({ ...formData, descrizione: e.target.value })} placeholder="Descrivi le novità di questa versione..." rows="5" />
+            </label>
+          </form>
+        </Modal>
+      )
+      }
 
-              <div className="form-actions">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary"
-                  onClick={() => setShowModal(false)}
-                  disabled={submitting}
-                >
-                  Annulla
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={submitting}
-                >
-                  {submitting ? (
-                    <>
-                      <span className="spinner"></span>
-                      Salvataggio...
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-save"></i>
-                      Salva Versione
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {showModal && (
+        <Modal
+          title="Aggiungi Nuova Versione"
+          onClose={() => setShowModal(false)}
+          footer={
+            <>
+              <Button type="button" variant="secondary" onClick={() => setShowModal(false)} disabled={submitting}>
+                Annulla
+              </Button>
+              <Button type="submit" form="version-form" variant="primary" loading={submitting}>
+                {submitting ? "Salvataggio..." : "Salva Versione"}
+              </Button>
+            </>
+          }
+        >
+          <form id="version-form" onSubmit={handleSubmit} className="ui-form-stack">
+            <Input type="text" id="titolo" value={formData.titolo} onChange={(e) => setFormData({ ...formData, titolo: e.target.value })} label="Titolo" placeholder="Versione 1.0.0" required />
+
+            <Input type="date" id="data" value={formData.data} onChange={(e) => setFormData({ ...formData, data: e.target.value })} label="Data di rilascio" required />
+
+            <label className="ui-field" htmlFor="descrizione">
+              <span className="ui-field__label">Descrizione</span>
+              <textarea className="ui-textarea" id="descrizione" value={formData.descrizione} onChange={(e) => setFormData({ ...formData, descrizione: e.target.value })} placeholder="Descrivi le novità di questa versione..." rows="5" />
+            </label>
+          </form>
+        </Modal>
       )}
     </div>
-  );
+  )
 }

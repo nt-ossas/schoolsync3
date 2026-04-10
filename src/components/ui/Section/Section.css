@@ -1,0 +1,37 @@
+﻿.ui-section {
+  display: grid;
+  gap: 24px;
+}
+
+.ui-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
+}
+
+.ui-section__heading h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  font-weight: 650;
+}
+
+.ui-section__heading p {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.ui-section__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ui-section__body {
+  min-width: 0;
+}

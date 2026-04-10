@@ -1,107 +1,59 @@
-import { useEffect, useState } from "react";
-import "./ultimi-voti.css";
+import "./ultimi-voti.css"
+import { Card } from "../components/ui"
 
-export function UltimiVoti({ user, apiUrl, anno, refreshKey }) {
-  const [loading, setLoading] = useState(false);
-  const [voti, setVoti] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    caricaVoti();
-  }, [user, anno, refreshKey]); // Aggiunto refreshKey come dipendenza
-
-  async function caricaVoti() {
-    if (!user?.id || anno === undefined || anno === null) {
-      setVoti([]);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const params = new URLSearchParams({
-        user_id: user.id,
-        anno: anno
-      });
-      
-      const response = await fetch(
-        `${apiUrl}/carica_voti_all.php?${params.toString()}`,
-      );
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const text = await response.text();
-      let data;
-      
-      try {
-        data = JSON.parse(text);
-      } catch (jsonError) {
-        console.error("Errore parsing JSON:", jsonError, "Testo ricevuto:", text);
-        throw new Error("Risposta non valida dal server");
-      }
-      
-      if (!data.success) {
-        throw new Error(data.error || "errore nel caricamento dei voti");
-      }
-
-      const votiCaricati = data.voti || [];
-      setVoti(votiCaricati);
-    } catch (err) {
-      console.error("errore caricamento voti:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
+export function UltimiVoti({ user, voti = [] }) {
+  const width = typeof window !== "undefined" ? window.innerWidth : 1200
+  const votiMostrati = width >= 768 ? 6 : 2
+  const votiDaMostrare = voti.slice(0, votiMostrati)
 
   const formatta = (valore) => {
-    const intero = Math.floor(valore);
-    const decimale = valore - intero;
+    const numero = parseFloat(String(valore).replace(",", "."))
+    if (Number.isNaN(numero)) return String(valore)
 
-    if (decimale === 0) {
-      return intero.toString();
-    } else if (decimale === 0.25) {
-      return `${intero}+`;
-    } else if (decimale === 0.5) {
-      return `${intero}½`;
-    } else if (decimale === 0.75) {
-      return `${intero + 1}-`;
-    }
-  };
+    const intero = Math.floor(numero)
+    const decimale = numero - intero
+
+    if (decimale === 0) return intero.toString()
+    if (decimale === 0.25) return `${intero}+`
+    if (decimale === 0.5) return `${intero}½`
+    if (decimale === 0.75) return `${intero + 1}-`
+    return numero.toString()
+  }
 
   return (
-    <>
-      <div className="ultimi-voti-container stat-card">
-        {error ? (
-          <div className="error-message">
-            <p>Errore: {error}</p>
-            <button onClick={caricaVoti} className="btn btn-small btn-primary">
-              Riprova
-            </button>
+    <Card className={"ultimi-voti-container"}>
+      <div className="ultimi-voti-head">
+        <div className="flex">
+          <div className="square-icon">
+            <i className={`fa-solid fa-clock-rotate-left`}></i>
           </div>
-        ) : loading ? (
-          <p>Caricamento in corso...</p>
-        ) : voti.length > 0 ? (
-          <>
-            <p className="voti-count">Ultimi {Math.min(voti.length, 16)} vot{voti.length == 1 ? "o" : "i"} attuali</p>
-            <ul className="ultimi-voti-lista">
-              {voti.slice(0, 16).map((voto) => {
-                const votoClass = "voto-badge ultimi-voti" + (voto.voto < 5 ? " insufficiente" : voto.voto < 6 ? " mid" : voto.voto >= 6 ? " sufficiente" : " nullo");
-                return (
-                  <li key={voto.id} className={votoClass}>
-                    {formatta(voto.voto)}
-                  </li>
-                );
-              })}
-            </ul>
-          </>
-        ) : (
-          <p>Nessun voto disponibile per l'anno selezionato.</p>
-        )}
+          <div className="className=ultimi-voti-title">
+            <h3>Ultimi Voti</h3>
+          </div>
+        </div>
+        {voti.length > 0 && <p className="voti-count">{Math.min(voti.length, votiMostrati)} vot{voti.length === 1 ? "o" : "i"}</p>}
       </div>
-    </>
-  );
+
+      {voti.length > 0 ? (
+        <ul className="ultimi-voti-lista">
+          {votiDaMostrare.map((voto, index) => {
+            const votoNum = parseFloat(String(voto.voto).replace(",", "."))
+            const votoClass = `voto-badge ultimi-voti${votoNum < 5 ? " insufficiente" : votoNum < 6 ? " mid" : votoNum >= 6 ? " sufficiente" : " nullo"}`
+            const votoFormattato = formatta(voto.voto)
+
+            return (
+              <li key={`${voto.materia || "materia"}-${votoFormattato}-${index}`} className="voto-item ultimi-voti-item">
+                <span className={votoClass}>{votoFormattato}</span>
+                <span className="materia">{voto.materia}</span>
+              </li>
+            )
+          })}
+        </ul>
+      ) : (
+        <div className="ultimi-voti-state">
+          <p>Nessun voto disponibile per l'anno selezionato.</p>
+        </div>
+      )}
+    </Card>
+  )
 }

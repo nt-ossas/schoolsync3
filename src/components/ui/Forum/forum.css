@@ -1,0 +1,305 @@
+.forum-card {
+  padding: var(--space-3);
+}
+
+.forum-card--expired {
+  opacity: 0.85;
+}
+
+.forum-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.forum-header h3 {
+  margin-bottom: 4px;
+}
+
+.forum-header p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.forum-header > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.forum-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft-border);
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.forum-card--expired .forum-icon {
+  background: var(--danger-soft);
+  border-color: var(--danger-soft-border);
+  color: var(--danger);
+}
+
+/* Badge scadenza */
+.forum-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: var(--primary);
+  border: 1px solid var(--accent-soft-border);
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-left: auto;
+}
+
+.forum-badge--expired {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: var(--danger-soft-border);
+}
+
+/* --- Options --- */
+.forum-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.forum-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated-2);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.forum-option:not(:disabled):hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg-elevated-2));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.forum-option:not(:disabled):active {
+  transform: scale(0.985);
+}
+
+.forum-option:disabled {
+  cursor: default;
+}
+
+/* Progress bar */
+.forum-option__bar {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background: linear-gradient(90deg, 
+    color-mix(in srgb, var(--primary) 15%, transparent) 0%,
+    color-mix(in srgb, var(--primary) 8%, transparent) 100%
+  );
+  border-radius: var(--radius-sm);
+  transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.forum-option--selected .forum-option__bar {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--primary) 22%, transparent) 0%,
+    color-mix(in srgb, var(--primary) 12%, transparent) 100%
+  );
+}
+
+/* Label */
+.forum-option__label {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+/* Percentage */
+.forum-option__pct {
+  position: relative;
+  z-index: 1;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  min-width: 42px;
+  text-align: right;
+  opacity: 0;
+  animation: forum-fade-in 0.4s ease 0.3s forwards;
+}
+
+/* Check icon */
+.forum-option__check {
+  position: relative;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 0.65rem;
+  opacity: 0;
+  animation: forum-fade-in 0.35s ease 0.2s forwards;
+}
+
+/* Selected state */
+.forum-option--selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+/* Voted but not selected — clickable to change */
+.forum-option--voted:not(.forum-option--selected):not(:disabled) {
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+.forum-option--voted:not(.forum-option--selected):not(:disabled):hover {
+  opacity: 1;
+}
+
+/* Expired + not selected */
+.forum-card--expired .forum-option--voted:not(.forum-option--selected) {
+  opacity: 0.65;
+}
+
+/* Footer */
+.forum-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--space-2);
+}
+
+.forum-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-success);
+  font-weight: 500;
+  opacity: 0;
+  animation: forum-fade-in 0.4s ease 0.5s forwards;
+}
+
+.forum-card--expired .forum-footer {
+  color: var(--text-secondary);
+}
+
+.forum-change-hint {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  opacity: 0;
+  animation: forum-fade-in 0.4s ease 0.6s forwards;
+}
+
+.forum-change-hint i {
+  margin-right: 4px;
+}
+
+/* Animations */
+@keyframes forum-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .forum-card {
+    padding: var(--space-2);
+  }
+
+  .forum-header {
+    gap: 10px;
+    margin-bottom: var(--space-2);
+  }
+
+  .forum-header h3 {
+    font-size: 1rem;
+  }
+
+  .forum-header p {
+    font-size: 0.82rem;
+  }
+
+  .forum-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    font-size: 0.95rem;
+  }
+
+  .forum-badge {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+    order: 3;
+    width: 100%;
+    text-align: center;
+  }
+
+  .forum-options {
+    gap: 8px;
+  }
+
+  .forum-option {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .forum-option__label {
+    flex: 1 1 auto;
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .forum-option__pct {
+    font-size: 0.88rem;
+    min-width: 36px;
+  }
+
+  .forum-option__check {
+    width: 20px;
+    height: 20px;
+    font-size: 0.6rem;
+  }
+
+  .forum-footer-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .forum-footer {
+    font-size: 0.8rem;
+  }
+
+  .forum-change-hint {
+    font-size: 0.72rem;
+  }
+}

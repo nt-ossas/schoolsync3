@@ -1,0 +1,76 @@
+﻿/* Shared form polish for modal-based flows */
+.ui-modal .ui-form-stack {
+  gap: 16px;
+}
+
+.ui-modal .ui-form-row {
+  gap: 16px;
+}
+
+.ui-modal .ui-field {
+  gap: 8px;
+}
+
+.ui-modal .ui-input,
+.ui-modal .ui-select,
+.ui-modal .ui-textarea {
+  background: var(--bg-elevated-2);
+}
+
+.ui-modal .ui-field__helper {
+  color: var(--text-tertiary);
+}
+
+.ui-modal .ui-textarea {
+  min-height: 128px;
+}
+
+.ui-modal .ui-modal__body {
+  background: color-mix(in srgb, var(--bg-elevated) 94%, #ffffff 6%);
+}
+
+.ui-modal .ui-modal__header h2 {
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.ui-modal .ui-modal__header {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ui-modal .ui-modal__footer {
+  gap: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ui-modal .ui-modal__footer .ui-btn--ghost {
+  color: var(--danger);
+}
+
+.ui-modal .ui-modal__footer .ui-btn--ghost:hover {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: #ffd5d1;
+}
+
+input[type="date"].ui-input,
+.ui-modal input[type="date"],
+.ui-modal input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-modal textarea::placeholder,
+.ui-modal input::placeholder {
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .ui-modal .ui-modal__footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .ui-modal .ui-modal__footer .ui-btn {
+    width: 100%;
+  }
+}

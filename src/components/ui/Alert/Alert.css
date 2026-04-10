@@ -1,0 +1,32 @@
+﻿.ui-alert {
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.ui-alert--info {
+  background: var(--accent-soft);
+  color: #dce4ff;
+  border-color: var(--accent-soft-border);
+}
+
+.ui-alert--success {
+  background: var(--success-soft);
+  color: #baf5d8;
+  border-color: var(--success-soft-border);
+}
+
+.ui-alert--error {
+  background: var(--danger-soft);
+  color: #ffc8c3;
+  border-color: var(--danger-soft-border);
+}
+
+.ui-alert--warning {
+  background: var(--warning-soft);
+  color: #f8e0b2;
+  border-color: var(--warning-soft-border);
+}

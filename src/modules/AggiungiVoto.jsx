@@ -1,112 +1,70 @@
-import { useState, useEffect } from "react";
-import "./aggiungi-voto.css";
+import { useState, useEffect } from "react"
+import { Modal, Button, Input, Select } from "../components/ui"
+import { gradeValuesDescending, formatGradeLabel } from "../constants/gradeOptions"
 
-export function AggiungiVoto({
-  user,
-  apiUrl,
-  materiaId,
-  onVotoAggiunto,
-  onClose,
-  periodo,
-  anno,
-  onVotoModificato,
-}) {
-  const [loading, setLoading] = useState(false);
-  const [materie, setMaterie] = useState([]);
-  
-  // Inizializza il form con materiaId se fornito
+export function AggiungiVoto({ user, apiUrl, materiaId, onVotoAggiunto, onClose, periodo, anno, onVotoModificato }) {
+  const [loading, setLoading] = useState(false)
+  const [materie, setMaterie] = useState([])
   const [formData, setFormData] = useState({
     materia_id: materiaId || "",
     voto: "",
-    periodo:
-      periodo !== undefined && periodo !== null ? periodo.toString() : "0",
+    periodo: periodo !== undefined && periodo !== null ? periodo.toString() : "0",
     tipo: "Scritto",
     peso: "100",
     data: new Date().toISOString().split("T")[0],
     descrizione: "",
-  });
+  })
 
   useEffect(() => {
-    caricaMaterie();
-  }, [user, anno]);
+    caricaMaterie()
+  }, [user, anno])
 
-  // Aggiorna materia_id quando cambia materiaId
   useEffect(() => {
     if (materiaId) {
-      setFormData(prev => ({
-        ...prev,
-        materia_id: materiaId
-      }));
+      setFormData((prev) => ({ ...prev, materia_id: materiaId }))
     }
-  }, [materiaId]);
+  }, [materiaId])
 
   async function caricaMaterie() {
     try {
-      const response = await fetch(
-        `${apiUrl}/carica_materie.php?user_id=${user.id}`,
-      );
-      const data = await response.json();
+      const response = await fetch(`${apiUrl}/carica_materie.php`, { credentials: "include" })
+      const data = await response.json()
       if (data.success) {
-        let materieFiltrate = data.materie || [];
+        let materieFiltrate = data.materie || []
+        if (anno !== undefined && anno !== null) materieFiltrate = materieFiltrate.filter((m) => m.anno == anno)
+        setMaterie(materieFiltrate)
 
-        if (anno !== undefined && anno !== null) {
-          materieFiltrate = materieFiltrate.filter((m) => m.anno == anno);
-        }
-
-        setMaterie(materieFiltrate);
-        
-        // Se non c'è una materia selezionata ma abbiamo materiaId, usala
         if (!formData.materia_id && materiaId) {
-          setFormData(prev => ({
-            ...prev,
-            materia_id: materiaId
-          }));
-        }
-        // Altrimenti seleziona la prima materia disponibile
-        else if (!formData.materia_id && materieFiltrate.length > 0) {
-          setFormData(prev => ({
-            ...prev,
-            materia_id: materieFiltrate[0].id
-          }));
+          setFormData((prev) => ({ ...prev, materia_id: materiaId }))
+        } else if (!formData.materia_id && materieFiltrate.length > 0) {
+          setFormData((prev) => ({ ...prev, materia_id: materieFiltrate[0].id }))
         }
       }
     } catch (err) {
-      console.error("Errore caricamento materie:", err);
+      console.error("Errore caricamento materie:", err)
     }
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!formData.materia_id) {
-      alert("Seleziona una materia");
-      return;
-    }
+    if (!formData.materia_id) return alert("Seleziona una materia")
 
-    const votoNum = parseFloat(formData.voto);
-    if (isNaN(votoNum) || votoNum < 2 || votoNum > 10) {
-      alert("Il voto deve essere un numero tra 2 e 10");
-      return;
-    }
+    const votoNum = parseFloat(formData.voto)
+    if (isNaN(votoNum) || votoNum < 2 || votoNum > 10) return alert("Il voto deve essere un numero tra 2 e 10")
 
-    setLoading(true);
+    setLoading(true)
 
     try {
       const response = await fetch(`${apiUrl}/aggiungi_voto.php`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: user.id,
           materia_id: formData.materia_id,
           voto: votoNum,
           periodo: parseInt(formData.periodo),
@@ -115,231 +73,79 @@ export function AggiungiVoto({
           peso: parseInt(formData.peso),
           descrizione: formData.descrizione,
         }),
-      });
+        credentials: "include",
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.success) {
-        if (onVotoAggiunto) {
-          onVotoAggiunto();
-        }
-        // Notifica che un voto è stato aggiunto
-        if (onVotoModificato) {
-          onVotoModificato();
-        }
-        if (onClose) {
-          onClose();
-        }
+        onVotoAggiunto?.()
+        onVotoModificato?.()
+        onClose?.()
       } else {
-        alert(`Errore: ${data.error || "Errore sconosciuto"}`);
+        alert(`Errore: ${data.error || "Errore sconosciuto"}`)
       }
     } catch (err) {
-      console.error("Errore:", err);
-      alert("Errore di connessione al server");
+      console.error("Errore:", err)
+      alert("Errore di connessione al server")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-
-  const formatta = (valore) => {
-    const intero = Math.floor(valore);
-    const decimale = valore - intero;
-
-    if (decimale === 0) {
-      return intero.toString();
-    } else if (decimale === 0.25) {
-      return `${intero}+`;
-    } else if (decimale === 0.5) {
-      return `${intero}½`;
-    } else if (decimale === 0.75) {
-      return `${intero + 1}-`;
-    }
-  };
-
-  const voti_options = () => {
-    const options = [];
-    let i = 10;
-    while (i >= 2) {
-      options.push(
-        <option key={i} value={i}>
-          {formatta(i)}
-        </option>,
-      );
-      i -= 0.25;
-    }
-    return options;
-  };
+  }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Aggiungi Voto</h2>
-          <button
-            type="button"
-            className="close-btn"
-            onClick={onClose}
-            aria-label="Chiudi"
-          >
-            <i className="fas fa-xmark"></i>
-          </button>
+    <Modal
+      title="Aggiungi Voto"
+      onClose={onClose}
+      footer={
+        <>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
+            Annulla
+          </Button>
+          <Button type="submit" form="add-voto-form" variant="primary" loading={loading}>
+            {loading ? "Aggiungendo..." : "+ Aggiungi Voto"}
+          </Button>
+        </>
+      }
+    >
+      <form id="add-voto-form" onSubmit={handleSubmit} className="ui-form-stack">
+        <Select id="materia_id" name="materia_id" value={formData.materia_id} onChange={handleChange} label="Materia" required disabled={loading}>
+          <option value="">Seleziona una materia</option>
+          {materie.map((materia) => (
+            <option key={materia.id} value={materia.id}>
+              {materia.nome}
+            </option>
+          ))}
+        </Select>
+
+        <div className="ui-form-row">
+        <Select id="voto" name="voto" value={formData.voto} onChange={handleChange} disabled={loading} required label="Voto" helperText="Da 2 a 10">
+          <option value="">Seleziona voto</option>
+          {gradeValuesDescending.map((value) => (
+            <option key={value} value={value}>
+              {formatGradeLabel(value)}
+            </option>
+          ))}
+        </Select>
+          <Input id="peso" type="number" name="peso" value={formData.peso} onChange={handleChange} label="Peso (%)" placeholder="100" min="0" max="100" step="10" required disabled={loading} helperText="0-100%" />
         </div>
 
-        <form onSubmit={handleSubmit} className="voto-form">
-          <div className="form-group">
-            <label htmlFor="materia_id">
-              Materia <span className="required">*</span>
-            </label>
-            <select
-              id="materia_id"
-              name="materia_id"
-              value={formData.materia_id}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            >
-              <option value="">Seleziona una materia</option>
-              {materie.map((materia) => (
-                <option key={materia.id} value={materia.id}>
-                  {materia.nome}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="ui-form-row">
+          <Select id="tipo" name="tipo" value={formData.tipo} onChange={handleChange} required disabled={loading} label="Tipo">
+            <option value="Scritto">Scritto</option>
+            <option value="Orale">Orale</option>
+            <option value="Pratico">Pratico</option>
+          </Select>
+          <Input id="data" type="date" name="data" value={formData.data} onChange={handleChange} required disabled={loading} label="Data" />
+        </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="voto">
-                Voto <span className="required">*</span>
-              </label>
-              <select
-                id="voto"
-                name="voto"
-                value={formData.voto}
-                onChange={handleChange}
-                disabled={loading}
-                required
-              >
-                <option value="">Seleziona voto</option>
-                {voti_options()}
-              </select>
-              <span className="helper-text">Da 2 a 10</span>
-            </div>
+        <Select id="periodo" name="periodo" value={formData.periodo} onChange={handleChange} required disabled={loading} label="Periodo">
+          <option value="0">Primo Periodo</option>
+          <option value="1">Secondo Periodo</option>
+        </Select>
 
-            <div className="form-group">
-              <label htmlFor="peso">
-                Peso (%) <span className="required">*</span>
-              </label>
-              <input
-                id="peso"
-                type="number"
-                name="peso"
-                value={formData.peso}
-                onChange={handleChange}
-                placeholder="100"
-                min="0"
-                max="200"
-                step="10"
-                required
-                disabled={loading}
-              />
-              <span className="helper-text">0-200% (0% = non influisce)</span>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="tipo">
-                Tipo <span className="required">*</span>
-              </label>
-              <select
-                id="tipo"
-                name="tipo"
-                value={formData.tipo}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              >
-                <option value="Scritto">Scritto</option>
-                <option value="Orale">Orale</option>
-                <option value="Pratico">Pratico</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="data">
-                Data <span className="required">*</span>
-              </label>
-              <input
-                id="data"
-                type="date"
-                name="data"
-                value={formData.data}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="periodo">
-              Periodo <span className="required">*</span>
-            </label>
-            <select
-              id="periodo"
-              name="periodo"
-              value={formData.periodo}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            >
-              <option value="0"> Primo Periodo</option>
-              <option value="1"> Secondo Periodo</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="descrizione">Descrizione</label>
-            <input
-              id="descrizione"
-              type="text"
-              name="descrizione"
-              value={formData.descrizione}
-              onChange={handleChange}
-              placeholder="Es: Verifica di matematica"
-              maxLength={100}
-              disabled={loading}
-            />
-            <span className="helper-text">Opzionale, max 100 caratteri</span>
-          </div>
-
-          <div className="form-actions">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-              disabled={loading}
-            >
-              Annulla
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <span className="spinner"></span>
-                  Aggiungendo...
-                </>
-              ) : (
-                <>+ Aggiungi Voto</>
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+        <Input id="descrizione" type="text" name="descrizione" value={formData.descrizione} onChange={handleChange} label="Descrizione" placeholder="Verifica di matematica" maxLength={100} disabled={loading} helperText="Opzionale, max 100 caratteri" />
+      </form>
+    </Modal>
+  )
 }

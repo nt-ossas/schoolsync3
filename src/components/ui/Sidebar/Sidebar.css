@@ -1,0 +1,117 @@
+﻿/* Base */
+.ui-sidebar {
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 80px);
+  width: 240px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-right: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--bg-main) 96%, transparent);
+  transition:
+    width var(--transition-fast),
+    background-color var(--transition-fast),
+    transform 220ms ease;
+}
+
+/* Collapsed desktop */
+.ui-sidebar.is-collapsed {
+  width: 72px;
+}
+
+.ui-sidebar__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ui-sidebar__title {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.ui-sidebar.is-collapsed .ui-sidebar__title {
+  font-size: 11px;
+}
+
+.ui-sidebar.is-collapsed .ui-sidebar__top {
+  justify-content: center;
+}
+
+.ui-sidebar__toggle {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.ui-sidebar__toggle:hover {
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--border-subtle));
+  background: var(--bg-elevated-2);
+  color: var(--text-main);
+}
+
+.ui-sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ui-sidebar__item {
+  min-width: 0;
+}
+
+/* Mobile ≤1024px: slide from top */
+@media (max-width: 1024px) {
+  .ui-sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 14px 16px 18px;
+    gap: 14px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-main);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--shadow-strong, #000) 12%, transparent);
+    transform: translateY(0);
+    z-index: 20;
+    height: 100vh;
+  }
+
+  .ui-sidebar.is-collapsed {
+    transform: translateY(-110%); /* lascia visibile la “maniglia” */
+    box-shadow: none;
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+
+  .ui-sidebar.is-collapsed .ui-sidebar__list {
+    display: none; /* evita click fantasma */
+  }
+
+  .ui-sidebar__top {
+    justify-content: space-between;
+    min-height: 40px;
+  }
+
+  .ui-sidebar__top i{
+    rotate: 90deg;
+  }
+
+  .ui-sidebar__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

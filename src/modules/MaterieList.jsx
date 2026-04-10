@@ -1,340 +1,177 @@
-import { useEffect, useState, useCallback } from "react";
-import { Materia } from "./Materia.jsx";
-import { AggiungiVoto } from "./AggiungiVoto.jsx";
-import { AggiungiMateria } from "./AggiungiMateria.jsx";
-import "./materie.css";
+import { useEffect, useState } from "react"
+import { Materia } from "./Materia.jsx"
+import { AggiungiVoto } from "./AggiungiVoto.jsx"
+import { AggiungiMateria } from "./AggiungiMateria.jsx"
+import { Button, Alert, Card } from "../components/ui"
+import "./materie.css"
 
-export function MaterieList({ 
-  user, 
-  apiUrl, 
-  onUpdateStats, 
-  periodo, 
-  anno,
-  onVotiModificati // Nuova prop per notificare modifiche voti
-}) {
-  const [materie, setMaterie] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showAddVoto, setShowAddVoto] = useState(false);
-  const [showAddMateria, setShowAddMateria] = useState(false);
-  const [selectedMateria, setSelectedMateria] = useState(null);
-  const [votiPerMateria, setVotiPerMateria] = useState({});
+export function MaterieList({ user, apiUrl, periodo, anno, onVotiModificati, materieEsterne, onMaterieChange }) {
+  const [materie, setMaterie] = useState(materieEsterne || [])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [showAddVoto, setShowAddVoto] = useState(false)
+  const [showAddMateria, setShowAddMateria] = useState(false)
+  const [selectedMateria, setSelectedMateria] = useState(null)
+  const [short, setShort] = useState(false)
 
   useEffect(() => {
-    caricaMaterie();
-  }, [user?.id, apiUrl]);
+    if (materieEsterne && materieEsterne.length > 0) {
+      setMaterie(materieEsterne)
+      setLoading(false)
+    }
+  }, [materieEsterne])
 
-  const handleVotiAggiornati = useCallback((materiaId, voti) => {
-    setVotiPerMateria((prev) => ({
-      ...prev,
-      [materiaId]: voti,
-    }));
-  }, []);
+  async function caricaMaterie() {
+    if (!user?.id) return
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await fetch(`${apiUrl}/carica_materie.php`, { method: "GET", credentials: "include" })
+      const data = await response.json()
+      if (!data.success) 
+        throw new Error(data.error || "errore nel caricamento delle materie")
+      setMaterie(data.materie || [])
+      onMaterieChange?.()
+    } catch (err) {
+      setError(err.message)
+    }
+    setLoading(false)
+  }
 
   const handleEliminaMateria = async (materiaId) => {
-    if (
-      !window.confirm(
-        "Sei sicuro di voler eliminare questa materia? Verranno eliminati anche tutti i voti associati!",
-      )
-    ) {
-      return;
-    }
-
+    if (!window.confirm("Sei sicuro di voler eliminare questa materia? Verranno eliminati anche tutti i voti associati!")) return
     try {
       const response = await fetch(`${apiUrl}/elimina_materia.php`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          materia_id: materiaId,
-        }),
-      });
-
-      const data = await response.json();
-
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ materia_id: materiaId }),
+        credentials: "include",
+      })
+      const data = await response.json()
       if (data.success) {
-        caricaMaterie();
-        // Notifica che i voti potrebbero essere cambiati
-        if (onVotiModificati) {
-          onVotiModificati();
-        }
+        caricaMaterie()
+        onVotiModificati?.()
       } else {
-        alert(`Errore: ${data.error || "Errore sconosciuto"}`);
+        alert(`Errore: ${data.error || "Errore sconosciuto"}`)
       }
     } catch (err) {
-      console.error("Errore eliminazione materia:", err);
-      alert("Errore di connessione al server: " + err.message);
+      alert("Errore di connessione al server: " + err.message)
     }
-  };
+  }
 
   const handleRinominaMateria = async (materiaId, nuovoNome) => {
-    if (!nuovoNome || nuovoNome.trim() === "") return;
-
+    if (!nuovoNome || nuovoNome.trim() === "") return
     try {
       const response = await fetch(`${apiUrl}/rinomina_materia.php`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          id_materia: materiaId,
-          nuovo_nome: nuovoNome.trim(),
-        }),
-      });
-
-      const data = await response.json();
-
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_materia: materiaId, nuovo_nome: nuovoNome.trim() }),
+        credentials: "include",
+      })
+      const data = await response.json()
       if (data.success) {
-        caricaMaterie();
-        alert("Materia rinominata con successo!");
+        caricaMaterie()
       } else {
-        alert(`Errore: ${data.error || "Errore sconosciuto"}`);
+        alert(`Errore: ${data.error || "Errore sconosciuto"}`)
       }
-    } catch (err) {
-      console.error("Errore rinomina materia:", err);
-      alert("Errore di connessione al server");
-    }
-  };
-
-  const calcolaStatisticheFiltrate = useCallback(() => {
-    let totVoti = 0;
-    let sommaVoti = 0;
-    let countVoti = 0;
-    let materieInsuff = 0;
-
-    // Filtra materie per anno (se anno >= 0)
-    const materieFiltratePerAnno = materie.filter((materia) => {
-      if (anno === -1 || anno === null || anno === undefined) {
-        return true; // Mostra tutte le materie quando anno = -1
-      }
-      return materia.anno == anno;
-    });
-
-    materieFiltratePerAnno.forEach((materia) => {
-      const votiMateria = votiPerMateria[materia.id] || [];
-
-      const votiFiltrati = votiMateria.filter((voto) => {
-        if (periodo === undefined || periodo === null) {
-          return true;
-        }
-        return voto.periodo == periodo;
-      });
-
-      totVoti += votiFiltrati.length;
-
-      if (votiFiltrati.length > 0) {
-        let sommaVotiMateria = 0;
-        let sommaPesi = 0;
-
-        votiFiltrati.forEach((voto) => {
-          const votoNum = parseFloat(voto.voto);
-          const peso = parseFloat(voto.peso || 1);
-          
-          if (!isNaN(votoNum) && !isNaN(peso) && peso > 0) {
-            sommaVotiMateria += votoNum * peso;
-            sommaPesi += peso;
-            sommaVoti += votoNum * peso;
-            countVoti += peso;
-          }
-        });
-
-        const mediaMateria = sommaPesi > 0 ? sommaVotiMateria / sommaPesi : 0;
-
-        if (mediaMateria < 6) {
-          materieInsuff++;
-        }
-      }
-    });
-
-    const mediaGenerale = countVoti > 0 ? (sommaVoti / countVoti).toFixed(2) : "N/D";
-
-    return {
-      materieTotali: materieFiltratePerAnno.length,
-      votiTotali: totVoti,
-      mediaGenerale: mediaGenerale,
-      materieInsuff: materieInsuff,
-    };
-  }, [materie, votiPerMateria, periodo, anno]);
-
-  useEffect(() => {
-    if (materie.length === 0 && Object.keys(votiPerMateria).length === 0) {
-      if (onUpdateStats) {
-        onUpdateStats({
-          materieTotali: 0,
-          votiTotali: 0,
-          mediaGenerale: "N/D",
-          materieInsuff: 0,
-        });
-      }
-      return;
-    }
-
-    const nuoveStats = calcolaStatisticheFiltrate();
-    if (onUpdateStats) {
-      onUpdateStats(nuoveStats);
-    }
-  }, [materie, votiPerMateria, periodo, anno, calcolaStatisticheFiltrate]);
-
-  async function caricaMaterie() {
-    if (!user?.id) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `${apiUrl}/carica_materie.php?user_id=${user.id}`,
-      );
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || "errore nel caricamento delle materie");
-      }
-
-      const materieCaricate = data.materie || [];
-      setMaterie(materieCaricate);
-    } catch (err) {
-      console.error("errore caricamento materie:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } catch {
+      alert("Errore di connessione al server")
     }
   }
 
   const handleOpenAddVoto = (materiaId = null) => {
-    setSelectedMateria(materiaId);
-    setShowAddVoto(true);
-  };
+    setSelectedMateria(materiaId)
+    setShowAddVoto(true)
+  }
 
   const handleVotoAggiunto = () => {
-    caricaMaterie();
-    // Notifica che un voto è stato aggiunto
-    if (onVotiModificati) {
-      onVotiModificati();
-    }
-  };
+    caricaMaterie()
+    onVotiModificati?.()
+  }
 
   const handleMateriaAggiunta = () => {
-    caricaMaterie();
-    setShowAddMateria(false);
-  };
+    caricaMaterie()
+    setShowAddMateria(false)
+  }
 
   if (loading) {
     return (
-      <div className="materie-list loading">
+      <Card className="materie-list loading">
         <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>caricamento materie...</p>
+          <div className="spinner" />
+          <p>Caricamento materie...</p>
         </div>
-      </div>
-    );
+      </Card>
+    )
   }
 
   if (error) {
     return (
-      <div className="materie-list error">
-        <div className="error-container">
-          <span className="error-icon">⚠️</span>
-          <p className="error-message">{error}</p>
-          <button className="btn btn-primary" onClick={() => caricaMaterie()}>
-            Riprova
-          </button>
-        </div>
-      </div>
-    );
+      <Card className="materie-list error">
+        <Alert variant="error">{error}</Alert>
+        <Button variant="primary" onClick={caricaMaterie}>
+          Riprova
+        </Button>
+      </Card>
+    )
   }
 
   if (materie.length === 0) {
     return (
-      <div className="materie-list empty">
+      <Card className="materie-list empty">
         <div className="empty-container">
-          <span className="empty-icon">📚</span>
-          <h3>Nessuna materia registrata</h3>
-          <p>Inizia aggiungendo la tua prima materia</p>
-          <button
-            className="btn btn-primary btn-large"
-            onClick={() => setShowAddMateria(true)}
-          >
-            + Aggiungi prima materia
-          </button>
+          <h3>Nessuna materia trovata</h3>
+          <i className="fa-regular fa-folder-open" />
+          <Button variant="primary" size="md" onClick={() => setShowAddMateria(true)}>
+            + Aggiungi materia
+          </Button>
         </div>
-
-        {showAddMateria && (
-          <AggiungiMateria
-            user={user}
-            apiUrl={apiUrl}
-            onMateriaAggiunta={handleMateriaAggiunta}
-            onClose={() => setShowAddMateria(false)}
-          />
-        )}
-      </div>
-    );
+        {showAddMateria && <AggiungiMateria user={user} apiUrl={apiUrl} onMateriaAggiunta={handleMateriaAggiunta} onClose={() => setShowAddMateria(false)} currentAnno={anno}/>}
+      </Card>
+    )
   }
 
-  // Filtra le materie visibili in base all'anno
   const materieVisibili = materie.filter((materia) => {
-    if (anno === -1 || anno === null || anno === undefined) {
-      return true; // Mostra tutte le materie quando anno = -1
-    }
-    return materia.anno == anno;
-  });
+    if (anno === -1 || anno === null || anno === undefined) return true
+    return materia.anno == anno
+  })
 
   if (anno !== -1 && materieVisibili.length === 0) {
     return (
-      <div className="materie-list empty">
+      <Card className="materie-list empty">
         <div className="empty-container">
-          <span className="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+          <span className="empty-icon">
+            <i className="fa-solid fa-magnifying-glass" />
+          </span>
           <h3>Nessuna materia per l'anno selezionato</h3>
-          <p>
-            Aggiungi una materia per l'anno {2023 + parseInt(anno)}-{2024 + parseInt(anno)}
-          </p>
-          <button
-            className="btn btn-primary btn-large"
-            onClick={() => setShowAddMateria(true)}
-          >
+          <p>Aggiungi una materia per l'anno {2023 + parseInt(anno)}-{2024 + parseInt(anno)}</p>
+          <Button variant="primary" size="lg" onClick={() => setShowAddMateria(true)}>
             + Aggiungi materia
-          </button>
+          </Button>
         </div>
-
-        {showAddMateria && (
-          <AggiungiMateria
-            user={user}
-            apiUrl={apiUrl}
-            onMateriaAggiunta={handleMateriaAggiunta}
-            onClose={() => setShowAddMateria(false)}
-          />
-        )}
-      </div>
-    );
+        {showAddMateria && <AggiungiMateria user={user} apiUrl={apiUrl} onMateriaAggiunta={handleMateriaAggiunta} onClose={() => setShowAddMateria(false)} currentAnno={anno}/>}
+      </Card>
+    )
   }
 
-  // Testo del titolo
-  const titolo = anno === -1 
-    ? `${materieVisibili.length} ${materieVisibili.length === 1 ? 'materia' : 'materie'} totali`
-    : `${materieVisibili.length} ${materieVisibili.length === 1 ? 'materia' : 'materie'} (A.S. ${2023 + parseInt(anno)}-${2024 + parseInt(anno)})`;
+  const titolo =
+    anno === -1
+      ? `${materieVisibili.length} ${materieVisibili.length === 1 ? "materia" : "materie"} totali`
+      : `${materieVisibili.length} ${materieVisibili.length === 1 ? "materia" : "materie"} (${2023 + parseInt(anno)}-${24 + parseInt(anno)})`
 
   return (
     <div className="materie-list">
       <div className="materie-header">
         <div className="header-info">
           <h2>{titolo}</h2>
+          <Button variant="ghost" onClick={() => setShort(!short)}>
+            {short ? <i className="fa-solid fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
+          </Button>
         </div>
         <div className="flex">
-          {/*<button
-            className="btn btn-small btn-primary"
-            onClick={() => handleOpenAddVoto()}
-          >
-            + Aggiungi voto
-          </button>*/}
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowAddMateria(true)}
-          >
+          <Button variant="primary" onClick={() => setShowAddMateria(true)}>
             + Aggiungi materia
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -347,10 +184,10 @@ export function MaterieList({
             apiUrl={apiUrl}
             onAddVoto={handleOpenAddVoto}
             periodo={periodo}
-            onVotiAggiornati={handleVotiAggiornati}
             onEliminaMateria={handleEliminaMateria}
             handleRinominaMateria={handleRinominaMateria}
-            onVotoModificato={onVotiModificati} // Passa la prop
+            onVotoModificato={onVotiModificati}
+            short={short}
           />
         ))}
       </div>
@@ -364,18 +201,11 @@ export function MaterieList({
           onClose={() => setShowAddVoto(false)}
           periodo={periodo}
           anno={anno}
-          onVotoModificato={onVotiModificati} // Passa la prop
+          onVotoModificato={onVotiModificati}
         />
       )}
 
-      {showAddMateria && (
-        <AggiungiMateria
-          user={user}
-          apiUrl={apiUrl}
-          onMateriaAggiunta={handleMateriaAggiunta}
-          onClose={() => setShowAddMateria(false)}
-        />
-      )}
+      {showAddMateria && <AggiungiMateria user={user} apiUrl={apiUrl} onMateriaAggiunta={handleMateriaAggiunta} onClose={() => setShowAddMateria(false)} currentAnno={anno}/>}
     </div>
-  );
+  )
 }

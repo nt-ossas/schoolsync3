@@ -1,0 +1,38 @@
+.page-404-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+}
+
+.page-404 {
+  max-width: 780px;
+  width: 100%;
+  text-align: center;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.page-404 h1 {
+  font-size: clamp(4rem, 15vw, 8rem);
+  margin: 0;
+  color: var(--color-accent-strong);
+}
+
+.page-404-icon {
+  font-size: 3.5rem;
+  opacity: 0.58;
+}
+
+.page-404-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 768px) {
+  .page-404-actions {
+    flex-direction: column;
+  }
+}
