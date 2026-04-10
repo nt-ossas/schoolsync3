@@ -1,8 +1,27 @@
 import "./footer.css"
-import { Link } from "react-router-dom"
+import { useEffect, useState }from "react"
 
 export function Footer() {
+  const [currentVersion, setCurrentVersion] = useState(null)
   const currentYear = new Date().getFullYear()
+
+  useEffect(() => {
+    fetchPackageVersion()
+  }, [])
+
+  const fetchPackageVersion = async () => {
+    try {
+      const response = await fetch(
+        `https://api.github.com/repos/nt-ossas/schoolsync3/contents/package.json`,
+        { headers: { "User-Agent": "SchoolSync" } }
+      );
+      const data = await response.json();
+      const decoded = JSON.parse(atob(data.content));
+      setCurrentVersion(decoded.version ?? null);
+    } catch {
+      setCurrentVersion(null);
+    }
+  }
 
   return (
     <footer className="footer">
@@ -12,7 +31,7 @@ export function Footer() {
             <span className="footer-logo">
               <i className="fa-solid fa-graduation-cap" />
             </span>
-            <h3 className="footer-title">SchoolSync</h3>
+            <h3 className="footer-title">SchoolSync {currentVersion && `v${currentVersion}`}</h3>
           </div>
 
           <p className="footer-tagline">La piattaforma intelligente per gestire il tuo percorso scolastico</p>
